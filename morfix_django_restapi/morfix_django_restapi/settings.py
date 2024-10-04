@@ -154,8 +154,10 @@ REST_FRAMEWORK = {
 
 # Настройка простого jwt (Javascript web token)
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_COOKIE_NAME': 'access_token',  # Название cookie для токена доступа
+    'AUTH_COOKIE_REFRESH_NAME': 'refresh_token',  # Название cookie для refresh токена
 }
