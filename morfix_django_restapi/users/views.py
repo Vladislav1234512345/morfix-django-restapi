@@ -5,20 +5,22 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .serializers import UserRegisterSerializer
+from .serializers import UserSerializer
 
 from django.conf import settings
-
 # Create your views here.
 
+
 class UserRegisterView(generics.CreateAPIView):
-    serializer_class = UserRegisterSerializer
+    serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         # Валидация данных и создание пользователя
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        # Сохраняем объект, в данном случае объект пользователя
         user = serializer.save()
 
         # Генерация токенов
@@ -44,11 +46,40 @@ class UserRegisterView(generics.CreateAPIView):
 
         return response
 
-class ProtectedView(APIView):
+class UserUpdateView(generics.UpdateAPIView):
+    # Класс сериализатора
+    serializer_class = UserSerializer
+    # Разрешенные классы
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        return Response({'message': 'You are protected.'})
+    # Метод получения объекта
+    def get_object(self):
+        # Получение экземпляра пользователя по пользователю, который отправил запрос
+        return self.request.user
+
+    # Обновление объекта сериализатора
+    def update(self, request, *args, **kwargs):
+        # Получение объекта профиля
+        instance = self.get_object()
+
+        # Получение сериализатора
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        # Проверка сериализатора
+        serializer.is_valid(raise_exception=True)
+
+        # Обновляем объект, в данном случае пользователь
+        self.perform_update(serializer)
+
+        # Возвращаем ответ с данными, заголовками и статусом кода
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UserDetailView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):

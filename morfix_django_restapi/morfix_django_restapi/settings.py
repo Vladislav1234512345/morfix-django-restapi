@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 from datetime import timedelta
@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'users',
+    'profiles',
 
     'rest_framework',
     'rest_framework_simplejwt',
@@ -86,10 +87,11 @@ WSGI_APPLICATION = 'morfix_django_restapi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'morfix-django-restapi',
+        'NAME': 'morfix_django_restapi',
         'USER': 'postgres',
         'PASSWORD': 'root',
-        'HOST': 'localhost',
+        # 'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
@@ -131,12 +133,25 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Расположение основного asgi приложения в проекте
+ASGI_APPLICATION = "django_project.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+            # "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 # Модель авторизации пользователя
 AUTH_USER_MODEL = 'users.User'
@@ -161,3 +176,35 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_NAME': 'access_token',  # Название cookie для токена доступа
     'AUTH_COOKIE_REFRESH_NAME': 'refresh_token',  # Название cookie для refresh токена
 }
+
+# Настройки логирования
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'verbose',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#         },
+#         'profiles': {  # Замените your_app_name на имя вашего приложения
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#         },
+#     },
+# }
