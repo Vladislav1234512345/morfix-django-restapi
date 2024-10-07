@@ -49,9 +49,10 @@
        "password": ""
    }
    response = {
-       "body": {
+       "json": {
            "access": ""
            "user": {
+               "id": "",
                "username": "",
                "email": "",
                "phone": ""
@@ -72,8 +73,14 @@
        "password": ""
    }
    response = {
-       "body": {
-           "access": ""
+       "json": {
+           "access": "",
+           "user": {
+               "id": "",
+               "username": "",
+               "email": "",
+               "phone": ""
+           }
        },
        cookies: {
                "refresh_token": ""
@@ -86,21 +93,24 @@
    method = PATCH
    media type = application/json
    content = {
-        # Контент может быть любым
-   }
-   response = {
        "headers": {
             "Authorization": "Bearer <jwt>"
-       }
-       "body": {
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+            # Контент может иметь любые поля таблицы
+        }
+   }
+   response = {
+       "json": {
+           "id": "",
            "username": "",
            "phone": "",
            "email": ""
        },
-       cookies: {
-               "refresh_token": ""
-           }
-       }
    }
    
    4. Данные пользователя:
@@ -108,20 +118,23 @@
    method = GET
    media type = application/json
    content = {
-   }
-   response = {
        "headers": {
             "Authorization": "Bearer <jwt>"
-       }
-       "body": {
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+        }
+   }
+   response = {
+       "json": {
+           "id": "",
            "username": "",
            "phone": "",
            "email": ""
        },
-       cookies: {
-               "refresh_token": ""
-           }
-       }
    }
 
    5. Генерация нового refresh токена:
@@ -129,32 +142,41 @@
    method = POST
    media type = application/json
    content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+        }
    }
    response = {
-       "body": {
+       "json": {
            "access": ""
        },
-       cookies: {
+       "cookies": {
                "refresh_token": ""
            }
        }
    }
 
-1. Приложение - profiles:
+2. Приложение - profiles:
 
     1. Создание профиля (анкеты):
     url = http://127.0.0.1:8000/api/profiles/create/
     method = POST
     media type = application/json
     content = {
-       "first_name": "",
-       "password": ""
-    }
-    response = {
        "headers": {
             "Authorization": "Bearer <jwt>"
-       }
-       "body": {
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
            "first_name": "",
            "last_name": "",
            "gender": "",
@@ -162,8 +184,177 @@
            "dating_purpose": "",
            "searching_gender": "",
        },
-       cookies: {
+    }
+    response = {
+       "json": {
+           "id": "",
+           "first_name": "",
+           "last_name": "",
+           "gender": "",
+           "birthday": "",
+           "dating_purpose": "",
+           "searching_gender": "",
+           "description": "",
+           "smokes_cigarettes": "",
+           "drinks_alcoholics": "",
+           "zodiac_signs": "",
+           "education": "",
+           "job": "",
+       }
+    } 
+   2. Обновление профиля (анкеты):
+   url = http://127.0.0.1:8000/api/profiles/update/
+   method = PATCH
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
                "refresh_token": ""
            }
+       },
+        "body": {
+           # Контент может иметь любые поля таблицы
+       },
+    }
+    response = {
+       "json": {
+           "id": "",
+           "first_name": "",
+           "last_name": "",
+           "gender": "",
+           "birthday": "",
+           "dating_purpose": "",
+           "searching_gender": "",
+           "description": "",
+           "smokes_cigarettes": "",
+           "drinks_alcoholics": "",
+           "zodiac_signs": "",
+           "education": "",
+           "job": "",
+       }
+    } 
+   3. Данные профиля (анкеты):
+   url = http://127.0.0.1:8000/api/profiles/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+   
+       },
+    }
+    response = {
+       "json": {
+           "id": "",
+           "first_name": "",
+           "last_name": "",
+           "gender": "",
+           "birthday": "",
+           "dating_purpose": "",
+           "searching_gender": "",
+           "description": "",
+           "smokes_cigarettes": "",
+           "drinks_alcoholics": "",
+           "zodiac_signs": "",
+           "education": "",
+           "job": "",
+       }
+    } 
+   4. Удаление фото профиля (анкеты):
+   url = http://127.0.0.1:8000/api/profiles/images/<id_фото>/delete/
+   method = DELETE
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+   
+       },
+    }
+    response = {
+       "json": {
+           "detail": "Profile image deleted successfully."
+       }
+    } 
+   5. Данные фото профиля (анкеты):
+   url = http://127.0.0.1:8000/api/profiles/images/<id_фото>/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+   
+       },
+    }
+    response = {
+       "json": {
+           "image": "",
+           "is_main_image": ""
        }
     }
+   6. Создаем фото профиля (анкеты):
+   url = http://127.0.0.1:8000/api/profiles/images/add/
+   method = POST
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+           # Отправляем через form-data, и даем тип полю image file, так как туда будем загружать изображение
+           "image": "",
+           "is_main_image": ""
+       },
+    }
+    response = {
+       "json": {
+           "image": "",
+           "is_main_image": ""
+       }
+    } 
+   7. Список фото профиля (анкеты):
+   url = http://127.0.0.1:8000/api/profiles/images/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+       },
+    }
+    response = {
+       "json": {
+           [
+               "image": "",
+               "is_main_image": ""
+           ]
+       }
+    } 

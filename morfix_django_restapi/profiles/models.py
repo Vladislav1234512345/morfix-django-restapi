@@ -64,7 +64,7 @@ class ProfileImage(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     image = models.ImageField(verbose_name='Изображение', upload_to='profiles/images/', null=False)
     uploaded_at = models.DateTimeField(verbose_name='Дата загрузки', auto_now_add=True)
-    is_profile_image = models.BooleanField(verbose_name='Изображение профиля', default=False)
+    is_main_image = models.BooleanField(verbose_name='Изображение профиля', default=False)
 
     class Meta:
         db_table = 'profile_images'

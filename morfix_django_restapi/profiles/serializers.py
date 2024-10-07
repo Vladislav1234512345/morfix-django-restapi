@@ -1,6 +1,8 @@
 import profile
 
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
+
 from .models import Profile, ProfileImage
 
 # Сериализатор для изображения профиля
@@ -9,51 +11,62 @@ class ProfileImageSerializer(serializers.ModelSerializer):
         # Модель сериализатора
         model = ProfileImage
         # Поля сериализатора
-        fields = ('image', 'is_profile_image')
+        fields = ('id', 'image', 'is_main_image')
+
+    # Метод создания объекта profile_image в сериализаторе
+    def create(self, validated_data):
+        # Получение пользователя из запроса в контексте
+        user = self.context['request'].user
+        # profile = Profile.objects.get(user=user)
+
+        # Получение объекта профиля по параметру user
+        profile = get_object_or_404(Profile, user=user)
+
+        profile_image = ProfileImage.objects.create(profile=profile, **validated_data)
+
+        return profile_image
+
+
 
 # Сериализатор профиля
 class ProfileSerializer(serializers.ModelSerializer):
-    # Вызов сериализатора "ProfileImageSerializer"
-    # параметр many означает, что сериализатор "ProfileImageSerializer" принимает список изображений
-    # параметр required=True означает, что сериализатор требует изображения
-    images = ProfileImageSerializer(many=True, required=True)
 
     class Meta:
         # Модель сериализатора
         model = Profile
         # Поля сериализатора
         fields = (
+            'id',
             'first_name',
             'last_name',
             'gender',
             'birthday',
             'dating_purpose',
-            'description',
             'searching_gender',
+            'description',
             'smokes_cigarettes',
             'drinks_alcoholics',
             'zodiac_signs',
             'education',
             'job',
-            'images',
         )
 
         # Поля сериализатора только для чтения
         read_only_fields = ('age',)
 
-    # Функция создания экземпляра сериализатора
+    # Метод создания экземпляра сериализатора
     def create(self, validated_data):
-        images_data = validated_data.pop('images', None)
-        profile = Profile.objects.create(**validated_data)
 
-        for image_data in images_data:
-            ProfileImage.objects.create(profile=profile, **image_data)
+        # Получение объекта пользователя из запроса в контексте
+        user = self.context['request'].user
+        # Создаение объекта профиля
+        profile = Profile.objects.create(user=user, **validated_data)
 
         return profile
 
-    # Функция обновления экземпляра сериализатора
+
+    # Метод обновления экземпляра сериализатора
     def update(self, instance, validated_data):
-        images_data = validated_data.pop('images', None)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.gender = validated_data.get('gender', instance.gender)
@@ -69,8 +82,5 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         # Сохраняем изменения профиля
         instance.save()
-
-        for image_data in images_data:
-            ProfileImage.objects.update_or_create(profile=profile, **image_data)
 
         return instance
