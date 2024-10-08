@@ -62,8 +62,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# # Разрешить все источники
+# CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOW_ALL_ORIGINS = True  # Разрешить все источники
+# Разрешеннные источники
+CORS_ALLOW_ORIGINS = [
+    "http://localhost:5173"
+]
+
 CORS_ALLOW_CREDENTIALS = True  # Разрешить передачу данных в куках
 
 CORS_ALLOW_METHODS = [
@@ -78,6 +84,14 @@ CORS_ALLOW_METHODS = [
 CORS_ALLOW_HEADERS = [
     '*',
 ]  # Разрешить все заголовки
+
+# Разрешить стандартные заголовки и в список добавить дополнительные
+CORS_ALLOWED_HEADERS = [
+    'Content-Type',
+    'Authorization',
+    'X-Custom-Header',
+    # Добавьте другие заголовки, если нужно
+]
 
 
 ROOT_URLCONF = 'morfix_django_restapi.urls'

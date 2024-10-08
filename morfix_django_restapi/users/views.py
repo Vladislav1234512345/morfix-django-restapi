@@ -1,11 +1,12 @@
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .serializers import UserSerializer
+
+from .models import User
 
 from django.conf import settings
 # Create your views here.
@@ -86,6 +87,20 @@ class UserDetailView(generics.RetrieveAPIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
+        # Извлекаем данные из запроса
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        # Проверяем, есть ли такой пользователь
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'detail': 'Пользователя с таким логином не существует.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Проверяем правильность пароля
+        if not user.check_password(password):
+            return Response({'detail': 'Неправильный пароль.'}, status=status.HTTP_400_BAD_REQUEST)
+
         response = super().post(request, *args, **kwargs)
         if response.status_code == status.HTTP_200_OK:
             refresh_token = response.data['refresh']
