@@ -74,6 +74,8 @@ class UserUpdateView(generics.UpdateAPIView):
         # Возвращаем ответ с данными, заголовками и статусом кода
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+
 class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
@@ -104,30 +106,53 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         return response
 
 
+class UserDeleteView(generics.DestroyAPIView):
+    # Для удаления пользователя необходимо, чтобы он был аутентифицирован
+    permission_classes = [IsAuthenticated]
+
+    # Получаем текущего пользователя
+    def get_object(self):
+        return self.request.user
+
+    # Переопределяем метод удаления для добавления кастомного ответа
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+        self.perform_destroy(user)
+
+        # Возвращаем успешный ответ после удаления пользователя
+        return Response({"detail": "Ваш аккаунт был успешно удален."}, status=status.HTTP_204_NO_CONTENT)
+
+
+
 class CustomTokenRefreshView(TokenRefreshView):
-    def post(self, request, *args, **kwargs):
-        request.data["refresh"] = request.COOKIES.get('refresh_token')
+    def get(self, request, *args, **kwargs):
+        # Извлечение refresh токена из куков
+        refresh_token = request.COOKIES.get(settings.SIMPLE_JWT.get('AUTH_COOKIE_REFRESH_NAME', 'refresh_token'))
 
-        if not request.data.get("refresh"):
-            Response({'detail': 'Refresh token не найден.'}, status=status.HTTP_401_UNAUTHORIZED)
+        if not refresh_token:
+            return Response({'detail': 'Refresh token не найден.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        response = super().post(request, request.data,*args, **kwargs)
+        # Передаем токен для проверки
+        request.data['refresh'] = refresh_token
 
+        # Вызываем стандартный метод TokenRefreshView (POST)
+        response = super().post(request, *args, **kwargs)
+
+        # Если запрос успешен, установим новый refresh токен в куки
         if response.status_code == status.HTTP_200_OK:
+            new_refresh_token = response.data.get('refresh')
 
-            new_refresh_token = response.data.get("refresh")
+            if new_refresh_token:
+                cookie_max_age = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()
+                response.set_cookie(
+                    key=settings.SIMPLE_JWT.get('AUTH_COOKIE_REFRESH_NAME', 'refresh_token'),
+                    value=new_refresh_token,
+                    httponly=True,
+                    max_age=int(cookie_max_age),
+                    samesite='Lax',
+                    secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', False)
+                )
 
-            cookie_max_age = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()
-            response.set_cookie(
-                key=settings.SIMPLE_JWT.get('AUTH_COOKIE_REFRESH_NAME', 'default_cookie_name'),
-                # Укажите значение по умолчанию
-                value=new_refresh_token,
-                httponly=True,
-                max_age=int(cookie_max_age),
-                samesite='Lax',
-                secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', False)  # Включай secure, если используешь HTTPS
-            )
-
-            del response.data['refresh']
+                del response.data['refresh']
 
         return response

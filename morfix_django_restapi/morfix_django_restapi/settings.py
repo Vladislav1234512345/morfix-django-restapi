@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'users',
     'profiles',
 
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -59,6 +61,24 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+CORS_ALLOW_ALL_ORIGINS = True  # Разрешить все источники
+CORS_ALLOW_CREDENTIALS = True  # Разрешить передачу данных в куках
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]  # Разрешить все методы
+
+CORS_ALLOW_HEADERS = [
+    '*',
+]  # Разрешить все заголовки
+
 
 ROOT_URLCONF = 'morfix_django_restapi.urls'
 

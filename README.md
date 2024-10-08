@@ -44,8 +44,6 @@
    media type = application/json
    content = {
        "username": "",
-       "email": "",
-       "phone": "",
        "password": ""
    }
    response = {
@@ -54,8 +52,6 @@
            "user": {
                "id": "",
                "username": "",
-               "email": "",
-               "phone": ""
            }
        },
        cookies: {
@@ -78,8 +74,6 @@
            "user": {
                "id": "",
                "username": "",
-               "email": "",
-               "phone": ""
            }
        },
        cookies: {
@@ -108,8 +102,6 @@
        "json": {
            "id": "",
            "username": "",
-           "phone": "",
-           "email": ""
        },
    }
    
@@ -132,14 +124,32 @@
        "json": {
            "id": "",
            "username": "",
-           "phone": "",
-           "email": ""
+       },
+   }
+   5. Удаление пользователя:
+   url = http://127.0.0.1:8000/api/delete/
+   method = DELETE
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+        }
+   }
+   response = {
+       "json": {
+           "detail": "Ваш аккаунт был успешно удален."
        },
    }
 
-   5. Генерация нового refresh токена:
-   url = http://127.0.0.1:8000/api/users/token/refresh
-   method = POST
+   6. Генерация нового refresh токена:
+   url = http://127.0.0.1:8000/api/users/token/refresh/
+   method = GET
    media type = application/json
    content = {
        "headers": {
