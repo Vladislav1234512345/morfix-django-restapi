@@ -85,14 +85,6 @@ CORS_ALLOW_HEADERS = [
     '*',
 ]  # Разрешить все заголовки
 
-# Разрешить стандартные заголовки и в список добавить дополнительные
-CORS_ALLOWED_HEADERS = [
-    'Content-Type',
-    'Authorization',
-    'X-Custom-Header',
-    # Добавьте другие заголовки, если нужно
-]
-
 
 ROOT_URLCONF = 'morfix_django_restapi.urls'
 

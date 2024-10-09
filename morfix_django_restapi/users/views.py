@@ -112,7 +112,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 value=refresh_token,
                 httponly=True,
                 max_age=int(cookie_max_age),
-                samesite='Lax',
+                samesite='None',
                 secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', False)  # Включай secure, если используешь HTTPS
             )
 
