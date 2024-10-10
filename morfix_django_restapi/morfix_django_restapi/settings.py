@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Разрешенные хосты
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -66,8 +67,9 @@ MIDDLEWARE = [
 # CORS_ALLOW_ALL_ORIGINS = True
 
 # Разрешеннные источники
-CORS_ALLOW_ORIGINS = [
-    "http://localhost:5173"
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 CORS_ALLOW_CREDENTIALS = True  # Разрешить передачу данных в куках
@@ -82,9 +84,21 @@ CORS_ALLOW_METHODS = [
 ]  # Разрешить все методы
 
 CORS_ALLOW_HEADERS = [
-    '*',
-]  # Разрешить все заголовки
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",  # Фронтенд адрес для доверенных запросов с CSRF-токеном
+    "http://127.0.0.1:5173",
+]
 
 ROOT_URLCONF = 'morfix_django_restapi.urls'
 
@@ -116,8 +130,8 @@ DATABASES = {
         'NAME': 'morfix_django_restapi',
         'USER': 'postgres',
         'PASSWORD': 'root',
-        # 'HOST': 'localhost',
-        'HOST': 'db',
+        'HOST': 'localhost',
+        # 'HOST': 'db',
         'PORT': '5432',
     }
 }

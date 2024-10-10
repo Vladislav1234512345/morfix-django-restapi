@@ -172,6 +172,8 @@
        }
    }
 
+
+
 2. Приложение - profiles:
 
     1. Создание профиля (анкеты):
@@ -192,7 +194,7 @@
            "gender": "",
            "birthday": "",
            "dating_purpose": "",
-           "searching_gender": "",
+           "searching_gender": ""
        },
     }
     response = {
@@ -210,6 +212,7 @@
            "zodiac_signs": "",
            "education": "",
            "job": "",
+           "age": "",
        }
     } 
    2. Обновление профиля (анкеты):
@@ -243,6 +246,7 @@
            "zodiac_signs": "",
            "education": "",
            "job": "",
+           "age": "",
        }
     } 
    3. Данные профиля (анкеты):
@@ -276,9 +280,45 @@
            "zodiac_signs": "",
            "education": "",
            "job": "",
+           "age": "",
        }
     } 
-   4. Удаление фото профиля (анкеты):
+   4. Данные подходящих профилей (анкет):
+   url = http://127.0.0.1:8000/api/profiles/get_profiles/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+   
+       },
+    }
+    response = {
+       "json": {
+           "id": "",
+           "first_name": "",
+           "last_name": "",
+           "gender": "",
+           "birthday": "",
+           "dating_purpose": "",
+           "searching_gender": "",
+           "description": "",
+           "smokes_cigarettes": "",
+           "drinks_alcoholics": "",
+           "zodiac_signs": "",
+           "education": "",
+           "job": "",
+           "age": "",
+           "images": []
+       }
+    } 
+   5. Удаление фото профиля (анкеты):
    url = http://127.0.0.1:8000/api/profiles/images/<id_фото>/delete/
    method = DELETE
    media type = application/json
@@ -299,7 +339,7 @@
            "detail": "Profile image deleted successfully."
        }
     } 
-   5. Данные фото профиля (анкеты):
+   6. Данные фото профиля (анкеты):
    url = http://127.0.0.1:8000/api/profiles/images/<id_фото>/
    method = GET
    media type = application/json
@@ -321,7 +361,7 @@
            "is_main_image": ""
        }
     }
-   6. Создаем фото профиля (анкеты):
+   7. Создаем фото профиля (анкеты):
    url = http://127.0.0.1:8000/api/profiles/images/add/
    method = POST
    media type = application/json
@@ -345,7 +385,7 @@
            "is_main_image": ""
        }
     } 
-   7. Список фото профиля (анкеты):
+   8. Список фото профиля (анкеты):
    url = http://127.0.0.1:8000/api/profiles/images/
    method = GET
    media type = application/json

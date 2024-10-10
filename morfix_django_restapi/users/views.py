@@ -9,7 +9,6 @@ from .serializers import UserSerializer
 from .models import User
 
 from django.conf import settings
-# Create your views here.
 
 
 class UserRegisterView(generics.CreateAPIView):
@@ -112,7 +111,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 value=refresh_token,
                 httponly=True,
                 max_age=int(cookie_max_age),
-                samesite='None',
+                samesite='Lax',
                 secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', False)  # Включай secure, если используешь HTTPS
             )
 

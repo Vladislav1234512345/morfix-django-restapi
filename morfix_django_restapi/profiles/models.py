@@ -1,5 +1,3 @@
-from tabnanny import verbose
-
 from django.db import models
 from users.models import User
 
@@ -45,13 +43,14 @@ class Profile(models.Model):
     zodiac_signs = models.BooleanField(verbose_name='Знаки Зодиака', choices=ZodiacSigns.choices, max_length=11, null=True, blank=True)
     education = models.CharField(verbose_name='Обучение', max_length=200, null=True, blank=True)
     job = models.CharField(verbose_name='Работа', max_length=200, null=True, blank=True)
+    age = models.PositiveIntegerField(verbose_name='Возраст', null=True, blank=True)
 
-    @property
-    def age(self):
+    def save(self, *args, **kwargs):
+        # Вычисляем возраст на основе даты рождения
         today = date.today()
-
-        age = today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
-        return age
+        self.age = today.year - self.birthday.year - (
+                    (today.month, today.day) < (self.birthday.month, self.birthday.day))
+        super().save(*args, **kwargs)
 
 
     class Meta:
@@ -61,7 +60,7 @@ class Profile(models.Model):
 
 
 class ProfileImage(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(verbose_name='Изображение', upload_to='profiles/images/', null=False)
     uploaded_at = models.DateTimeField(verbose_name='Дата загрузки', auto_now_add=True)
     is_main_image = models.BooleanField(verbose_name='Изображение профиля', default=False)

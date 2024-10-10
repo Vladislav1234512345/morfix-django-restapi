@@ -11,7 +11,7 @@ class ProfileImageSerializer(serializers.ModelSerializer):
         # Модель сериализатора
         model = ProfileImage
         # Поля сериализатора
-        fields = ('id', 'image', 'is_main_image')
+        fields = ('id', 'image', 'uploaded_at', 'is_main_image')
 
     # Метод создания объекта profile_image в сериализаторе
     def create(self, validated_data):
@@ -49,10 +49,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             'zodiac_signs',
             'education',
             'job',
+            'age',
         )
-
-        # Поля сериализатора только для чтения
-        read_only_fields = ('age',)
 
     # Метод создания экземпляра сериализатора
     def create(self, validated_data):
@@ -79,6 +77,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.zodiac_signs = validated_data.get('zodiac_signs', instance.zodiac_signs)
         instance.education = validated_data.get('education', instance.education)
         instance.job = validated_data.get('job', instance.job)
+        instance.age = validated_data.get('age', instance.age)
 
         # Сохраняем изменения профиля
         instance.save()

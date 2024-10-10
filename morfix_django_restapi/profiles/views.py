@@ -1,5 +1,10 @@
+import random
+
+from datetime import date
+
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -20,6 +25,19 @@ class ProfileCreateView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         # Проверяем данные сериализатора
         serializer.is_valid(raise_exception=True)
+
+        # Получаем день рождения из сериализатора
+        birthday = serializer.validated_data.get('birthday')
+
+        # Получаем сегодняшний день
+        today = date.today()
+
+        # Получаем возраст
+        age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
+
+        # Проверяем возраст
+        if int(age) < 18:
+            return Response({'detail': 'Возраст должен быть 18 лет или старше.'}, status=status.HTTP_403_FORBIDDEN)
 
         # Создаем объект, в данном случае объект профиля
         self.perform_create(serializer)
@@ -155,3 +173,60 @@ class ProfileImageListView(generics.ListAPIView):
         profile_images = ProfileImage.objects.filter(profile__user=user).all()
         # Возвращение изображений пользователя
         return profile_images
+
+
+@api_view(['GET'])
+def get_profiles(request):
+    # Объект профиля
+    profile = get_object_or_404(Profile, user=request.user)
+
+    # Количество профилей для поиска
+    PROFILES_COUNT = 5
+
+    # Разрешенный размах в возрасте
+    ALLOWED_AGE_DIFFERENCE = 5
+
+    # Минимальный возраст профиля для поиска
+    min_age = profile.age - ALLOWED_AGE_DIFFERENCE
+
+    # Максимальный возраст профиля для поиска
+    max_age = profile.age + ALLOWED_AGE_DIFFERENCE
+
+    # Список объектов профилей для мэтча
+    searching_profiles = Profile.objects.filter(
+        gender=profile.searching_gender,
+        searching_gender=profile.gender,
+        age__range=(min_age, max_age)
+    ).exclude(user=request.user).prefetch_related('images')
+
+    # Явно указываем тип list для searching_profiles
+    searching_profiles = list(searching_profiles)
+
+    # Перемешиваем профили
+    random.shuffle(searching_profiles)
+
+    # Ограничиваем количество найденных профилей
+    searching_profiles = searching_profiles[:PROFILES_COUNT]
+
+    # Список данных подходящих профилей
+    searching_profiles_data = []
+
+    # Цикл из подходящих профилей
+    for searching_profile in searching_profiles:
+        # Данные подходящего профиля из сериализатора
+        searching_profile_data = ProfileSerializer(searching_profile).data
+        # Изображение подходящих профилей
+        searching_profile_images = ProfileImage.objects.filter(profile=searching_profile)
+        # Данные изображений подходящих профилей из сериализатора
+        searching_profile_images_data = ProfileImageSerializer(searching_profile_images, many=True).data
+        # Добавление в данные подходящего профиля из сериализатора поля images,
+        # который является данными изображений подходящего профиля
+        searching_profile_data["images"] = searching_profile_images_data
+        # Добавление данных подходящего профиля в список подходящих профилей
+        searching_profiles_data.append(searching_profile_data)
+
+    # Ответ с данными и статусом кода 200
+    return Response(searching_profiles_data, status=status.HTTP_200_OK)
+
+
+
