@@ -181,16 +181,16 @@ def get_profiles(request):
     profile = get_object_or_404(Profile, user=request.user)
 
     # Количество профилей для поиска
-    PROFILES_COUNT = 5
+    profiles_count = int(request.GET.get("profiles_count", 20))
 
     # Разрешенный размах в возрасте
-    ALLOWED_AGE_DIFFERENCE = 5
+    allowed_age_difference = int(request.GET.get("allowed_age_difference", 5))
 
     # Минимальный возраст профиля для поиска
-    min_age = profile.age - ALLOWED_AGE_DIFFERENCE
+    min_age = profile.age - allowed_age_difference
 
     # Максимальный возраст профиля для поиска
-    max_age = profile.age + ALLOWED_AGE_DIFFERENCE
+    max_age = profile.age + allowed_age_difference
 
     # Список объектов профилей для мэтча
     searching_profiles = Profile.objects.filter(
@@ -206,7 +206,7 @@ def get_profiles(request):
     random.shuffle(searching_profiles)
 
     # Ограничиваем количество найденных профилей
-    searching_profiles = searching_profiles[:PROFILES_COUNT]
+    searching_profiles = searching_profiles[:profiles_count]
 
     # Список данных подходящих профилей
     searching_profiles_data = []

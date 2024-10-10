@@ -284,7 +284,9 @@
        }
     } 
    4. Данные подходящих профилей (анкет):
-   url = http://127.0.0.1:8000/api/profiles/get_profiles/
+   url = http://127.0.0.1:8000/api/profiles/get_profiles/?profiles_count=<int>&allowed_age_difference=<int>
+   profiles_count - количество запрашиваемых профилей - int
+   allowed_age_difference - разрешенная разница в возрасте - int
    method = GET
    media type = application/json
    content = {
