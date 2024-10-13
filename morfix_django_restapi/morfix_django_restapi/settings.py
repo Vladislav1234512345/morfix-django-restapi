@@ -32,10 +32,11 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
-
 INSTALLED_APPS = [
+    'daphne',
     'users',
     'profiles',
+    'chats',
 
     'corsheaders',
     'rest_framework',
@@ -182,7 +183,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Расположение основного asgi приложения в проекте
-ASGI_APPLICATION = "django_project.asgi.application"
+ASGI_APPLICATION = "morfix_django_restapi.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -215,6 +216,7 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_COOKIE_NAME': 'access_token',  # Название cookie для токена доступа
     'AUTH_COOKIE_REFRESH_NAME': 'refresh_token',  # Название cookie для refresh токена
+    'AUTH_COOKIE_SECURE': False,  # Защищенность куки
 }
 
 # Настройки логирования
