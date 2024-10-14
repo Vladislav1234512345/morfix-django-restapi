@@ -189,12 +189,11 @@
            }
        },
         "body": {
-           "first_name": "",
-           "last_name": "",
-           "gender": "",
-           "birthday": "",
-           "dating_purpose": "",
-           "searching_gender": ""
+           "first_name": "", # Строка
+           "gender": "", # Выбор одного из следующих значений: "RELATIONSHIP" (серьезные отношения), "FRIENDSHIP" (Общение и дружба), "FLIRT" (Флирт и свидания), "UNRESOLVED" (Решу потом)
+           "birthday": "", # Дата в формате: YYYY-MM-DD
+           "dating_purpose": "", # Выбор одного из следующих значений: "MALE" (Мужчина), "FEMALE" (Женщина)
+           "searching_gender": "" # Выбор одного из следующих значений: "MALE" (Мужчина), "FEMALE" (Женщина)
        },
     }
     response = {
