@@ -316,6 +316,7 @@
            "education": "",
            "job": "",
            "age": "",
+           "hobbies": [],
            "images": []
        }
     } 
@@ -408,4 +409,92 @@
                "is_main_image": ""
            ]
        }
+    }
+   9. Добавление хобби профиля (анкеты):
+   url = http://127.0.0.1:8000/api/profiles/hobbies/add/
+   method = POST
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+           "name": ""
+       },
+    }
+    response = {
+       "json": {
+           "id": "",
+           "name": ""
+       }
+    } 
+   10. Удаление хобби профиля (анкеты):
+   url = http://127.0.0.1:8000/api/profiles/hobbies/<id_хобби>/delete/
+   method = DELETE
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+       },
+    }
+    response = {
+       "json": {
+           "detail": "Хобби профиля успешно удалено."
+       }
+    } 
+   11. Все хобби профиля (анкеты):
+   url = http://127.0.0.1:8000/api/profiles/hobbies/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+       },
+    }
+    response = {
+       "json": [
+           {
+               "id": "",
+               "name": ""
+           }
+       ]
+    } 
+   12. Все cуществующие хобби в бд:
+   url = http://127.0.0.1:8000/api/profiles/hobbies/list/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+       },
+    }
+    response = {
+       "json": [
+           {
+               "id": "",
+               "name": ""
+           }
+       ]
     } 

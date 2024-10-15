@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Chat, ChatUsers, Message
+from .models import Chat, ChatUser, Message
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -9,9 +9,9 @@ class ChatSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'image', 'is_group']
 
 
-class ChatUsersSerializer(serializers.ModelSerializer):
+class ChatUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ChatUsers
+        model = ChatUser
         fields = ['id', 'chat', 'user', 'date_joined', 'invite_reason', 'last_seen']
 
 

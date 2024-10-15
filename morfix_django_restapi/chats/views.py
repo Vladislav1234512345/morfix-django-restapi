@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from .models import Chat, Message, ChatUsers
+from .models import Chat, Message, ChatUser
 from .serializers import ChatSerializer, MessageSerializer
 
 
@@ -14,7 +14,7 @@ class ChatListView(APIView):
         Возвращает список чатов для текущего пользователя.
         """
         user = request.user
-        chats = ChatUsers.objects.filter(user=user)
+        chats = ChatUser.objects.filter(user=user)
         chats_list = []
 
         for chat_user in chats:

@@ -1,9 +1,42 @@
-import profile
-
 from rest_framework import serializers
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import get_object_or_404
 
-from .models import Profile, ProfileImage
+from .models import Profile, ProfileImage, Hobby, ProfileHobby
+from .functions import get_profile
+
+# Сериализатора для хобби
+class HobbySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hobby
+        fields = ('id', 'name')
+
+# Сериализатор для хобби профиля
+class ProfileHobbySerializer(serializers.ModelSerializer):  # Используем ModelSerializer
+    name = serializers.CharField(max_length=250, required=True)
+
+    class Meta:
+        model = ProfileHobby
+        fields = ('id', 'name')
+
+    def create(self, validated_data):
+        profile = get_profile(self.context.get("request"))
+        hobby_name = validated_data['name']
+
+        # Проверяем, существует ли хобби
+        try:
+            hobby = Hobby.objects.get(name=hobby_name)
+        except Hobby.DoesNotExist:
+            raise NotFound({"detail": "Данного хобби не существует."})
+
+        # Проверяем, существует ли уже это хобби у профиля
+        if ProfileHobby.objects.filter(profile=profile, hobby=hobby).exists():
+            raise serializers.ValidationError({"detail": "Данное хобби уже есть."})
+
+        # Создаем новое хобби
+        profile_hobby = ProfileHobby.objects.create(profile=profile, hobby=hobby)
+        return profile_hobby
+
 
 # Сериализатор для изображения профиля
 class ProfileImageSerializer(serializers.ModelSerializer):
@@ -17,7 +50,6 @@ class ProfileImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Получение пользователя из запроса в контексте
         user = self.context['request'].user
-        # profile = Profile.objects.get(user=user)
 
         # Получение объекта профиля по параметру user
         profile = get_object_or_404(Profile, user=user)
@@ -38,7 +70,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'first_name',
-            'last_name',
             'gender',
             'birthday',
             'dating_purpose',
@@ -66,7 +97,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     # Метод обновления экземпляра сериализатора
     def update(self, instance, validated_data):
         instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.gender = validated_data.get('gender', instance.gender)
         instance.birthday = validated_data.get('birthday', instance.birthday)
         instance.dating_purpose = validated_data.get('dating_purpose', instance.dating_purpose)

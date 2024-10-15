@@ -5,7 +5,7 @@ from channels.db import database_sync_to_async
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
-from .models import Chat, Message, ChatUsers
+from .models import Chat, Message, ChatUser
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -77,7 +77,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     # Обновление chat_user
     def update_chat_user(self, chat, user):
         # Находим запись для chat и user
-        chat_user = ChatUsers.objects.get(chat=chat, user=user)
+        chat_user = ChatUser.objects.get(chat=chat, user=user)
         # Обновляем поле date_joined
         chat_user.last_seen = timezone.now()
         # Сохраняем экземпляр

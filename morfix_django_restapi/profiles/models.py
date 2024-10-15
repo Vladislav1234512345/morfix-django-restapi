@@ -31,8 +31,7 @@ class Profile(models.Model):
         UNRESOLVED = 'UNRESOLVED', 'Решу потом'
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    first_name = models.CharField(verbose_name='Имя пользователя', max_length=200)
-    last_name = models.CharField(verbose_name='Фамилия пользователя', max_length=200)
+    first_name = models.CharField(verbose_name='Имя пользователя', max_length=200, null=False, blank=False)
     gender = models.CharField(verbose_name='Пол', choices=Gender.choices, max_length=6, null=False, blank=False)
     birthday = models.DateField(verbose_name='День рождения', null=False, blank=False)
     dating_purpose = models.CharField(verbose_name='Цель знакомства', choices=DatingPurpose.choices, max_length=12, null=False, blank=False)
@@ -44,6 +43,7 @@ class Profile(models.Model):
     education = models.CharField(verbose_name='Обучение', max_length=200, null=True, blank=True)
     job = models.CharField(verbose_name='Работа', max_length=200, null=True, blank=True)
     age = models.PositiveIntegerField(verbose_name='Возраст', null=True, blank=True)
+    hobbies = models.ManyToManyField('Hobby', related_name='profiles', through='ProfileHobby')
 
     def save(self, *args, **kwargs):
         # Вычисляем возраст на основе даты рождения
@@ -59,8 +59,12 @@ class Profile(models.Model):
         verbose_name_plural = 'Профили'
 
 
+    def __str__(self):
+        return self.user.username
+
+
 class ProfileImage(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='images')
+    profile = models.ForeignKey(Profile, on_delete=models.PROTECT, related_name='images')
     image = models.ImageField(verbose_name='Изображение', upload_to='profiles/images/', null=False)
     uploaded_at = models.DateTimeField(verbose_name='Дата загрузки', auto_now_add=True)
     is_main_image = models.BooleanField(verbose_name='Изображение профиля', default=False)
@@ -69,3 +73,31 @@ class ProfileImage(models.Model):
         db_table = 'profile_images'
         verbose_name = 'Изображение профиля'
         verbose_name_plural = 'Изображения профиля'
+
+    def __str__(self):
+        return f"{self.profile.user.username} - {self.id}"
+
+
+class Hobby(models.Model):
+    name = models.CharField(verbose_name="Имя хобби", max_length=250, unique=True, null=False, blank=False)
+
+    class Meta:
+        db_table = 'hobbies'
+        verbose_name = 'Хобби'
+        verbose_name_plural = 'Хобби'
+
+
+    def __str__(self):
+        return self.name
+
+class ProfileHobby(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.PROTECT, related_name='profile_hobbies')
+    hobby = models.ForeignKey(Hobby, on_delete=models.PROTECT, related_name='hobby_profiles')
+
+    class Meta:
+        db_table = 'profile_hobbies'
+        verbose_name = 'Хобби профиля'
+        verbose_name_plural = 'Хобби профиля'
+
+    def __str__(self):
+        return f"{self.profile.user.username} - {self.hobby.name}"
