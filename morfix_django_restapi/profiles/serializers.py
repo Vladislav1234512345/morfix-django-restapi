@@ -58,6 +58,14 @@ class ProfileImageSerializer(serializers.ModelSerializer):
 
         return profile_image
 
+    def update(self, instance, validated_data):
+        instance.image = validated_data.get('image', instance.image)
+        instance.is_main_image = validated_data.get('is_main_image', instance.is_main_image)
+
+        instance.save()
+
+        return instance
+
 
 
 # Сериализатор профиля
@@ -81,6 +89,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'education',
             'job',
             'age',
+            'is_active',
         )
 
     # Метод создания экземпляра сериализатора
@@ -108,6 +117,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.education = validated_data.get('education', instance.education)
         instance.job = validated_data.get('job', instance.job)
         instance.age = validated_data.get('age', instance.age)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
 
         # Сохраняем изменения профиля
         instance.save()

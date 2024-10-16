@@ -44,6 +44,7 @@ class Profile(models.Model):
     job = models.CharField(verbose_name='Работа', max_length=200, null=True, blank=True)
     age = models.PositiveIntegerField(verbose_name='Возраст', null=True, blank=True)
     hobbies = models.ManyToManyField('Hobby', related_name='profiles', through='ProfileHobby')
+    is_active = models.BooleanField(verbose_name="Профиль активен", default=True)
 
     def save(self, *args, **kwargs):
         # Вычисляем возраст на основе даты рождения

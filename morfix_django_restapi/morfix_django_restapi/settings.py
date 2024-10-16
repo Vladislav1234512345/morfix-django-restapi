@@ -131,8 +131,8 @@ DATABASES = {
         'NAME': 'morfix_django_restapi',
         'USER': 'postgres',
         'PASSWORD': 'root',
-        'HOST': 'localhost',
-        # 'HOST': 'db',
+        # 'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }

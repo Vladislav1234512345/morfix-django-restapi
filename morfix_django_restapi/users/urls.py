@@ -7,5 +7,5 @@ urlpatterns = [
     path('login/', CustomTokenObtainPairView.as_view(), name='login'), # Для получения access и refresh токенов при авторизации
     path('token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'), # Для обновления access токена
     path('delete/', UserDeleteView.as_view(), name='delete'), # Удаление пользователя
-    path('', UserDetailView.as_view(), name='detail'), # Данные пользователя
+    path('', UserDetailView.as_view(), name='info'), # Данные пользователя
 ]

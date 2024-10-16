@@ -14,6 +14,216 @@ from .serializers import ProfileSerializer, ProfileImageSerializer, ProfileHobby
 
 from .models import Profile, ProfileImage, Hobby, ProfileHobby
 
+
+# Класс создания хобби профиля
+class ProfileHobbyCreateView(generics.GenericAPIView):
+    # Класс сериализатора
+    serializer_class = ProfileHobbySerializer
+    # Разрешенные классы
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        # Получение профиля
+        get_profile(self.request)
+
+        serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        profile_hobby = serializer.save()
+
+        response = {
+            "id": profile_hobby.id,
+            "name": profile_hobby.hobby.name,
+        }
+
+        return Response(response, status=status.HTTP_201_CREATED)
+
+
+class ProfileHobbyListView(generics.ListAPIView):
+    serializer_class = ProfileHobbySerializer
+
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Получаем профиль текущего пользователя
+        profile = get_profile(self.request)
+        profile_hobbies = ProfileHobby.objects.filter(profile=profile)  # Получаем все ProfileHobby для данного пользователя
+
+        profile_hobbies_list = []
+
+        for profile_hobby in profile_hobbies:
+            profile_hobby_dict = {
+                "id": profile_hobby.id,
+                "name": profile_hobby.hobby.name,
+            }
+
+            profile_hobbies_list.append(profile_hobby_dict)
+
+        return profile_hobbies_list
+
+
+class ProfileHobbyDeleteView(generics.DestroyAPIView):
+    serializer_class = ProfileHobbySerializer
+
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        # Объект профиля из запроса
+        profile = get_profile(self.request)
+        # Получение изображения профиля по ID и проверка, что оно принадлежит профилю
+        profile_hobby = get_object_or_404(ProfileHobby, id=self.kwargs['pk'], profile=profile)
+        # Возвращаем объект иозображения пользователя
+        return profile_hobby
+
+    # Метод удаления объекта при помощи сериализатора
+    def delete(self, request, *args, **kwargs):
+        # Получения объекта profile_hobby
+        profile_hobby = self.get_object()
+        # Удаляем хобби профиля
+        profile_hobby.delete()
+        # Отправка ответа с данными и статусом кода
+        return Response({"detail": "Хобби профиля успешно удалено."}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_hobbies_list(request):
+
+    hobbies = Hobby.objects.all()
+
+    hobbies_list_data = []
+
+    for hobby in hobbies:
+        hobby_list_data = HobbySerializer(hobby).data
+        hobbies_list_data.append(hobby_list_data)
+
+    return Response(hobbies_list_data, status=status.HTTP_200_OK)
+
+
+
+
+# Класс создания изображения профиля
+class ProfileImageCreateView(generics.CreateAPIView):
+    # Класс сериализатора
+    serializer_class = ProfileImageSerializer
+    # Разрешенные классы
+    permission_classes = [IsAuthenticated]
+
+    # Создание объекта сериализатора
+    def create(self, request, *args, **kwargs):
+        # Получение профиля
+        get_profile(self.request)
+        # Получаем сериализатор
+        serializer = self.get_serializer(data=request.data)
+        # Проверяем данные сериализатора
+        serializer.is_valid(raise_exception=True)
+
+        # Создаем объект, в данном случае объект profile_image
+        self.perform_create(serializer)
+
+        # Получаем заголовки при успешном выполнении
+        headers = self.get_success_headers(serializer.data)
+
+        # Возвращаем ответ с данными, заголовками и статусом кода
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+# Класс обновления изображения профиля
+class ProfileImageUpdateView(generics.UpdateAPIView):
+    # Класс сериализатора
+    serializer_class = ProfileImageSerializer
+    # Разрешенные классы
+    permission_classes = [IsAuthenticated]
+
+    # Метод получения объекта profile_image
+    def get_object(self):
+        # Объект профиля из запроса
+        profile = get_profile(self.request)
+        # Получение изображения профиля по ID и проверка, что оно принадлежит профилю
+        profile_image = get_object_or_404(ProfileImage, id=self.kwargs['pk'], profile=profile)
+        # Возвращаем объект иозображения пользователя
+        return profile_image
+
+    # Обновление объекта сериализатора
+    def update(self, request, *args, **kwargs):
+
+        # Получение объекта профиля
+        instance = self.get_object()
+
+        # Получение сериализатора
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        # Проверка сериализатора
+        serializer.is_valid(raise_exception=True)
+
+        # Обновляем объект, в данном случае профиль
+        self.perform_update(serializer)
+
+        # Возвращаем ответ с данными, заголовками и статусом кода
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# Класс удаления изображения профиля
+class ProfileImageDeleteView(generics.DestroyAPIView):
+    # Класс сериализатора
+    serializer_class = ProfileImageSerializer
+    # Разрешенные классы
+    permission_classes = [IsAuthenticated]
+
+    # Метод получения объекта profile_image
+    def get_object(self):
+        # Объект профиля из запроса
+        profile = get_profile(self.request)
+        # Получение изображения профиля по ID и проверка, что оно принадлежит профилю
+        profile_image = get_object_or_404(ProfileImage, id=self.kwargs['pk'], profile=profile)
+        # Возвращаем объект иозображения пользователя
+        return profile_image
+
+    # Метод удаления объекта при помощи сериализатора
+    def delete(self, request, *args, **kwargs):
+        # Получения объекта profile_image
+        profile_image = self.get_object()
+        # Удаляем изображение профиля
+        profile_image.delete()
+        # Отправка ответа с данными и статусом кода
+        return Response({"detail": "Изображение профиля успешно удалено."}, status=status.HTTP_200_OK)
+
+
+# Класс получения изображения профиля
+class ProfileImageRetrieveView(generics.RetrieveAPIView):
+    # Класс сериализатора
+    serializer_class = ProfileImageSerializer
+    # Разрешенные классы
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        # Объект профиля из запроса
+        profile = get_profile(self.request)
+        # Получаем объект изображения по id и проверяем, что оно связано с профилем
+        profile_image = get_object_or_404(ProfileImage, id=self.kwargs['pk'], profile=profile)
+        # Возвращаем объект изображения профиля
+        return profile_image
+
+# Класс получения списка изображений профиля
+class ProfileImageListView(generics.ListAPIView):
+    # Класс сериализатора
+    serializer_class = ProfileImageSerializer
+    # Разрешенные классы
+    permission_classes = [IsAuthenticated]
+
+    # Метод получения списка объектов изображений профиля
+    def get_queryset(self):
+        # Объект профиля из запроса
+        profile = get_profile(self.request)
+        # Изображения профиля по профилю
+        profile_images = ProfileImage.objects.filter(profile=profile).all()
+        # Возвращение изображений пользователя
+        return profile_images
+
+
+
+
 # Класс создания профиля
 class ProfileCreateView(generics.CreateAPIView):
     # Класс сериализатора
@@ -102,7 +312,43 @@ class ProfileRetrieveView(generics.RetrieveAPIView):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_profiles(request):
+def profile_full_info(request):
+    # Получение объекта профиля или ошибка 404
+    profile = get_profile(request)
+    # Получение данных профиля
+    profile_data = ProfileSerializer(profile).data
+
+
+    profile_hobbies = ProfileHobby.objects.filter(profile=profile).all()
+
+    profile_hobbies_data = []
+
+    for profile_hobby in profile_hobbies:
+        profile_hobby_dict = {
+            "id": profile_hobby.id,
+            "name": profile_hobby.hobby.name,
+        }
+
+        profile_hobbies_data.append(profile_hobby_dict)
+
+    profile_data["hobbies"] = profile_hobbies_data
+
+
+    profile_images = ProfileImage.objects.filter(profile=profile).all()
+
+    profile_images_data = ProfileImageSerializer(profile_images, many=True).data
+
+    profile_data["images"] = profile_images_data
+
+
+    return Response(profile_data, status=status.HTTP_200_OK)
+
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_profiles(request):
     # Объект профиля
     profile = get_profile(request)
 
@@ -120,6 +366,8 @@ def get_profiles(request):
 
     # Список объектов профилей для мэтча
     searching_profiles = Profile.objects.filter(
+        is_active=True,
+        dating_purpose=profile.dating_purpose,
         gender=profile.searching_gender,
         searching_gender=profile.gender,
         age__range=(min_age, max_age)
@@ -177,174 +425,7 @@ def get_profiles(request):
     return Response(searching_profiles_data, status=status.HTTP_200_OK)
 
 
-# Класс создания изображения профиля
-class ProfileImageCreateView(generics.CreateAPIView):
-    # Класс сериализатора
-    serializer_class = ProfileImageSerializer
-    # Разрешенные классы
-    permission_classes = [IsAuthenticated]
-
-    # Создание объекта сериализатора
-    def create(self, request, *args, **kwargs):
-        # Получение профиля
-        get_profile(self.request)
-        # Получаем сериализатор
-        serializer = self.get_serializer(data=request.data)
-        # Проверяем данные сериализатора
-        serializer.is_valid(raise_exception=True)
-
-        # Создаем объект, в данном случае объект profile_image
-        self.perform_create(serializer)
-
-        # Получаем заголовки при успешном выполнении
-        headers = self.get_success_headers(serializer.data)
-
-        # Возвращаем ответ с данными, заголовками и статусом кода
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-# Класс удаления изображения профиля
-class ProfileImageDeleteView(generics.DestroyAPIView):
-    # Класс сериализатора
-    serializer_class = ProfileImageSerializer
-    # Разрешенные классы
-    permission_classes = [IsAuthenticated]
-
-    # Метод получения объекта profile_image
-    def get_object(self):
-        # Объект профиля из запроса
-        profile = get_profile(self.request)
-        # Получение изображения профиля по ID и проверка, что оно принадлежит профилю
-        profile_image = get_object_or_404(ProfileImage, id=self.kwargs['pk'], profile=profile)
-        # Возвращаем объект иозображения пользователя
-        return profile_image
-
-    # Метод удаления объекта при помощи сериализатора
-    def delete(self, request, *args, **kwargs):
-        # Получения объекта profile_image
-        profile_image = self.get_object()
-        # Удаляем изображение профиля
-        profile_image.delete()
-        # Отправка ответа с данными и статусом кода
-        return Response({"detail": "Изображение профиля успешно удалено."}, status=status.HTTP_200_OK)
-
-
-# Класс получения изображения профиля
-class ProfileImageRetrieveView(generics.RetrieveAPIView):
-    # Класс сериализатора
-    serializer_class = ProfileImageSerializer
-    # Разрешенные классы
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        # Объект профиля из запроса
-        profile = get_profile(self.request)
-        # Получаем объект изображения по id и проверяем, что оно связано с профилем
-        profile_image = get_object_or_404(ProfileImage, id=self.kwargs['pk'], profile=profile)
-        # Возвращаем объект изображения профиля
-        return profile_image
-
-# Класс получения списка изображений профиля
-class ProfileImageListView(generics.ListAPIView):
-    # Класс сериализатора
-    serializer_class = ProfileImageSerializer
-    # Разрешенные классы
-    permission_classes = [IsAuthenticated]
-
-    # Метод получения списка объектов изображений профиля
-    def get_queryset(self):
-        # Объект профиля из запроса
-        profile = get_profile(self.request)
-        # Изображения профиля по профилю
-        profile_images = ProfileImage.objects.filter(profile=profile).all()
-        # Возвращение изображений пользователя
-        return profile_images
-
-
-# Класс создания хобби профиля
-class ProfileHobbyCreateView(generics.GenericAPIView):
-    # Класс сериализатора
-    serializer_class = ProfileHobbySerializer
-    # Разрешенные классы
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        # Получение профиля
-        get_profile(self.request)
-
-        serializer = self.get_serializer(data=request.data)
-
-        serializer.is_valid(raise_exception=True)
-
-        profile_hobby = serializer.save()
-
-        response = {
-            "id": profile_hobby.id,
-            "name": profile_hobby.hobby.name,
-        }
-
-        return Response(response, status=status.HTTP_201_CREATED)
-
-
-class ProfileHobbyListView(generics.ListAPIView):
-    serializer_class = ProfileHobbySerializer
-
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        # Получаем профиль текущего пользователя
-        profile = get_profile(self.request)
-        profile_hobbies = ProfileHobby.objects.filter(profile=profile)  # Получаем все ProfileHobby для данного пользователя
-
-        profile_hobbies_list = []
-
-        for profile_hobby in profile_hobbies:
-            profile_hobby_dict = {
-                "id": profile_hobby.id,
-                "name": profile_hobby.hobby.name,
-            }
-
-            profile_hobbies_list.append(profile_hobby_dict)
-
-        return profile_hobbies_list
-
-
-class ProfileHobbyDeleteView(generics.DestroyAPIView):
-    serializer_class = ProfileHobbySerializer
-
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        # Объект профиля из запроса
-        profile = get_profile(self.request)
-        # Получение изображения профиля по ID и проверка, что оно принадлежит профилю
-        profile_hobby = get_object_or_404(ProfileHobby, id=self.kwargs['pk'], profile=profile)
-        # Возвращаем объект иозображения пользователя
-        return profile_hobby
-
-    # Метод удаления объекта при помощи сериализатора
-    def delete(self, request, *args, **kwargs):
-        # Получения объекта profile_hobby
-        profile_hobby = self.get_object()
-        # Удаляем хобби профиля
-        profile_hobby.delete()
-        # Отправка ответа с данными и статусом кода
-        return Response({"detail": "Хобби профиля успешно удалено."}, status=status.HTTP_200_OK)
-
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_hobbies_list(request):
-
-    hobbies = Hobby.objects.all()
-
-    hobbies_list_data = []
-
-    for hobby in hobbies:
-        hobby_list_data = HobbySerializer(hobby).data
-        hobbies_list_data.append(hobby_list_data)
-
-    return Response(hobbies_list_data, status=status.HTTP_200_OK)
 
 
