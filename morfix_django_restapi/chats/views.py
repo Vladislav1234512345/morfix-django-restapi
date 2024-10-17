@@ -43,10 +43,7 @@ def chat_room(request, chat_id):
     messages_data = MessageSerializer(messages, many=True).data
 
     return Response(
-        {
-            "chat_id": chat_id,
-            "messages": messages_data,
-        },
+        messages_data,
         status=status.HTTP_200_OK
     )
 

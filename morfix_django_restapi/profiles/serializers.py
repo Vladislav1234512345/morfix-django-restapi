@@ -85,6 +85,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'description',
             'smokes_cigarettes',
             'drinks_alcoholics',
+            'has_children',
             'zodiac_signs',
             'education',
             'job',
@@ -113,6 +114,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.searching_gender = validated_data.get('searching_gender', instance.searching_gender)
         instance.smokes_cigarettes = validated_data.get('smokes_cigarettes', instance.smokes_cigarettes)
         instance.drinks_alcoholics = validated_data.get('drinks_alcoholics', instance.drinks_alcoholics)
+        instance.has_children = validated_data.get('has_children', instance.has_children)
         instance.zodiac_signs = validated_data.get('zodiac_signs', instance.zodiac_signs)
         instance.education = validated_data.get('education', instance.education)
         instance.job = validated_data.get('job', instance.job)

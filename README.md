@@ -208,6 +208,7 @@
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
+           "has_children": "",
            "zodiac_signs": "",
            "education": "",
            "job": "",
@@ -243,6 +244,7 @@
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
+           "has_children": "",
            "zodiac_signs": "",
            "education": "",
            "job": "",
@@ -278,6 +280,7 @@
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
+           "has_children": "",
            "zodiac_signs": "",
            "education": "",
            "job": "",
@@ -313,6 +316,7 @@
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
+           "has_children": "",
            "zodiac_signs": "",
            "education": "",
            "job": "",
@@ -352,6 +356,7 @@
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
+           "has_children": "",
            "zodiac_signs": "",
            "education": "",
            "job": "",
@@ -410,6 +415,7 @@
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
+           "has_children": "",
            "zodiac_signs": "",
            "education": "",
            "job": "",
@@ -574,3 +580,91 @@
            }
        ]
     } 
+
+   14. Добавление чата:
+   url = http://127.0.0.1:8000/api/profile/create-chat/
+   method = POST
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+            "profile_id": "" #id профиля
+       },
+    }
+    response = {
+       1. "json": {
+            "detail": "Профиль не был создан." # Если анкеты текущего пользователя не существует
+        }
+       2. "json": {
+            "detail": "Анкеты, которая понравилась, не существует." # Если анкеты, которую лайкают, не существует
+        }
+       3. "json": {
+            "detail": "Чат успешно создан." # Если человек, который понравился, до этого уже лайкнул текущий профиль
+        }
+       4. "json": {
+            "detail": "Лайк успешно создан." # Если текущий профиль впервые лайкнул понравившуюся анкету
+        }
+       5. "json": {
+            "detail": "Лайк уже был отправлен." # Если текущий профиль уже лайкал понравившуюся анкету
+        }
+    } 
+
+3. Приложение - chats:
+   1. Все чаты пользователя:
+   url = http://127.0.0.1:8000/api/chat/list/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+       },
+    }
+    response = {
+       "json": [
+            {
+                'chat_id': "",
+                'last_message_text': "",
+                'messages_length': "",
+                'last_seen': ""
+            }
+       ]
+    }
+   2. Комната чата пользователя:
+   url = http://127.0.0.1:8000/api/chat/<chat_id>/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+       },
+    }
+    response = {
+       "json": [
+            {
+                'id': "",
+                'chat': "",
+                'sender': "",
+                'datetime': "",
+                'text': "",
+                'media': ""
+            }
+       ]
+    }

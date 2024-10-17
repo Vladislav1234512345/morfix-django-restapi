@@ -39,6 +39,7 @@ class Profile(models.Model):
     searching_gender = models.CharField(verbose_name='Кого ищет', choices=Gender.choices, max_length=6, null=False, blank=False)
     smokes_cigarettes = models.BooleanField(verbose_name='Курит сигареты', null=True, blank=True)
     drinks_alcoholics = models.BooleanField(verbose_name='Пьёт алкоголь', null=True, blank=True)
+    has_children = models.BooleanField(verbose_name='Есть дети', null=True, blank=True)
     zodiac_signs = models.BooleanField(verbose_name='Знаки Зодиака', choices=ZodiacSigns.choices, max_length=11, null=True, blank=True)
     education = models.CharField(verbose_name='Обучение', max_length=200, null=True, blank=True)
     job = models.CharField(verbose_name='Работа', max_length=200, null=True, blank=True)

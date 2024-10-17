@@ -448,7 +448,7 @@ def create_chat(request):
         searching_profile = Profile.objects.get(pk=profile_id)
     except Profile.DoesNotExist:
         # Отправка ответа с статусом кода 404 в случае, если профиля не существует
-        return Response({"detail": "Пользователя не существует"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "Анкеты, которая понравилась, не существует."}, status=status.HTTP_404_NOT_FOUND)
 
     # Получение объекта желанного пользователя
     searching_user = searching_profile.user
@@ -479,7 +479,7 @@ def create_chat(request):
         # Создаем объект пользователя чата с новым чатом и желанным пользователем
         ChatUser.objects.create(user=searching_user, chat=new_chat, date_joined=datetime_now, invite_reason='Был приглашен в чат.')
         # Отправка ответа о том, что чат успешно создани, а также статус код 201
-        return Response({"detail": "Чат успешно создан"}, status=status.HTTP_201_CREATED)
+        return Response({"detail": "Чат успешно создан."}, status=status.HTTP_201_CREATED)
 
     # Получение или создание объекта лайка, у которого отправитель данный профиль, а получатель желанный профиль
     new_like, new_like_created = Like.objects.get_or_create(receiver=searching_profile, sender=profile)
@@ -487,6 +487,8 @@ def create_chat(request):
     if new_like_created:
         # Сохранение изменения лайка
         new_like.save()
-    # Отправка ответа о том, что лайк успешно создан, и статутс код 201
-    return Response({"detail": "Лайк успешно создан"}, status.HTTP_201_CREATED)
+        # Отправка ответа о том, что лайк успешно создан, и статутс код 201
+        return Response({"detail": "Лайк успешно создан."}, status=status.HTTP_201_CREATED)
+
+    return Response({"detail": "Лайк уже был отправлен."}, status=status.HTTP_200_OK)
 
