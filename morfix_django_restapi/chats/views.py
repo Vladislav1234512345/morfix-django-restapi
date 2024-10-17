@@ -1,67 +1,52 @@
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.utils import timezone
 from .models import Chat, Message, ChatUser
 from .serializers import ChatSerializer, MessageSerializer
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def chats_list(request):
+    user = request.user
+    chats_user = ChatUser.objects.filter(user=user)
+    chats_user_data = []
 
-class ChatListView(APIView):
-    permission_classes = [IsAuthenticated]
+    for chat_user in chats_user:
+        messages = Message.objects.filter(chat=chat_user.chat, datetime__gt=chat_user.last_seen)
+        last_message = messages.order_by('datetime').last()
 
-    def get(self, request):
-        """
-        Возвращает список чатов для текущего пользователя.
-        """
-        user = request.user
-        chats = ChatUser.objects.filter(user=user)
-        chats_list = []
+        chat_data = {
+            'chat_id': chat_user.chat.id,
+            'last_message_text': last_message.text if last_message else None,
+            'messages_length': messages.count(),
+            'last_seen': chat_user.last_seen,
+        }
 
-        for chat_user in chats:
-            messages = Message.objects.filter(chat=chat_user.chat, datetime__gt=chat_user.last_seen)
-            last_message = messages.order_by('datetime').last()
+        chats_user_data.append(chat_data)
 
-            chat_data = {
-                'chat_id': chat_user.chat.id,
-                'last_message_text': last_message.text if last_message else None,
-                'messages_length': messages.count(),
-                'last_seen': chat_user.last_seen,
-            }
-            chats_list.append(chat_data)
-
-        return Response({"chats": chats_list})
+    return Response(chats_user_data, status=status.HTTP_200_OK)
 
 
-class ChatRoomView(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request, chat_id):
-        """
-        Возвращает детали чата и сообщения.
-        """
-        chat = Chat.objects.get(id=chat_id)
-        if request.user not in chat.users.all():
-            return Response({"detail": "Unauthorized"}, status=403)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def chat_room(request, chat_id):
 
-        messages = chat.messages.all()
-        serialized_messages = MessageSerializer(messages, many=True)
+    chat = Chat.objects.get(id=chat_id)
 
-        return Response({
+    if request.user not in chat.users.all():
+        return Response({"detail": "Пользователь не является членом данного чата."}, status=status.HTTP_403_FORBIDDEN)
+
+    messages = chat.messages.all()
+    messages_data = MessageSerializer(messages, many=True).data
+
+    return Response(
+        {
             "chat_id": chat_id,
-            "messages": serialized_messages.data,
-        })
-
-    def post(self, request, chat_id):
-        """
-        Отправка сообщения в чат.
-        """
-        chat = Chat.objects.get(id=chat_id)
-        if request.user not in chat.users.all():
-            return Response({"detail": "Unauthorized"}, status=403)
-
-        text = request.data.get('message')
-        if text:
-            message = Message.objects.create(chat=chat, sender=request.user, text=text)
-            return Response({"message": "Message sent", "message_id": message.id})
-        return Response({"error": "No message content"}, status=400)
+            "messages": messages_data,
+        },
+        status=status.HTTP_200_OK
+    )
 

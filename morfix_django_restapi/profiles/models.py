@@ -91,6 +91,7 @@ class Hobby(models.Model):
     def __str__(self):
         return self.name
 
+
 class ProfileHobby(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.PROTECT, related_name='profile_hobbies')
     hobby = models.ForeignKey(Hobby, on_delete=models.PROTECT, related_name='hobby_profiles')
@@ -102,3 +103,27 @@ class ProfileHobby(models.Model):
 
     def __str__(self):
         return f"{self.profile.user.username} - {self.hobby.name}"
+
+
+
+class Like(models.Model):
+    # Класс, который используется для enum поля данной таблицы
+    class Type(models.TextChoices):
+        #Выборы для enum поля в таблице
+        COMMON = 'COMMON', 'Обычный'
+        SUPER = 'SUPER', 'Супер'
+        MEGA = 'MEGA', 'Мега'
+
+    # Создание поля enum
+    type = models.CharField(max_length=6, choices=Type.choices, default=Type.COMMON)
+    receiver = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='received_likes')
+    sender = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='sent_likes')
+
+
+    def __str__(self):
+        return self.type
+
+    class Meta:
+        db_table = 'likes'
+        verbose_name = 'Лайк'
+        verbose_name_plural = 'Лайки'

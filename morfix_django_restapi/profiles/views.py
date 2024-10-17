@@ -1,4 +1,3 @@
-import json
 import random
 
 from datetime import date
@@ -9,10 +8,16 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from django.utils import timezone
+
 from .functions import get_profile
 from .serializers import ProfileSerializer, ProfileImageSerializer, ProfileHobbySerializer, HobbySerializer
 
-from .models import Profile, ProfileImage, Hobby, ProfileHobby
+from .models import Profile, ProfileImage, Hobby, ProfileHobby, Like
+
+from chats.models import Chat, ChatUser
+
+from chats.serializers import ChatSerializer
 
 
 # Класс создания хобби профиля
@@ -427,5 +432,61 @@ def search_profiles(request):
 
 
 
+@api_view(['POST'])
+@permission_classes
+def create_chat(request):
+    # Получение объекта профиля
+    profile = get_profile(request)
+    # Получение объекта пользователя из запроса
+    user = request.user
+    # Получение id профиля из post запроса
+    profile_id = request.POST.get("profile_id")
 
+    # Проверка существует ли желанный профиль
+    try:
+        # Получения профиля по его id
+        searching_profile = Profile.objects.get(pk=profile_id)
+    except Profile.DoesNotExist:
+        # Отправка ответа с статусом кода 404 в случае, если профиля не существует
+        return Response({"detail": "Пользователя не существует"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Получение объекта желанного пользователя
+    searching_user = searching_profile.user
+
+    # Поиск чата с участием пользователя, который ищет, и пользователя, которого ищет первый
+    chat = Chat.objects.filter(users=user).filter(users=searching_user).filter(is_group=False).first()
+
+    # Условие, которое выполниться в случае существования чата
+    if chat:
+        # Отправка ответа с данными чата и статусом кода 200
+        return Response(ChatSerializer(chat).data, status=status.HTTP_200_OK)
+
+    # Поиск объекта лайк, отправителем которого является желанный профиль, а получателем данный профиль
+    like = Like.objects.filter(receiver=profile, sender=searching_profile).first()
+
+    # Если существует объект лайка
+    if like:
+        # Удаляем лайк из бд
+        like.delete()
+        # Создаем новый чат
+        new_chat = Chat(is_group=False)
+        # Сохраняем изменения
+        new_chat.save()
+        # Дата и время сейчас
+        datetime_now = timezone.now()
+        # Создаем объект пользователя чата с новым чатом и данным пользователем
+        ChatUser.objects.create(user=user, chat=new_chat, date_joined=datetime_now, invite_reason='Создал чат.')
+        # Создаем объект пользователя чата с новым чатом и желанным пользователем
+        ChatUser.objects.create(user=searching_user, chat=new_chat, date_joined=datetime_now, invite_reason='Был приглашен в чат.')
+        # Отправка ответа о том, что чат успешно создани, а также статус код 201
+        return Response({"detail": "Чат успешно создан"}, status=status.HTTP_201_CREATED)
+
+    # Получение или создание объекта лайка, у которого отправитель данный профиль, а получатель желанный профиль
+    new_like, new_like_created = Like.objects.get_or_create(receiver=searching_profile, sender=profile)
+    # Если лайк не был найден, его создали и выполняеться условие
+    if new_like_created:
+        # Сохранение изменения лайка
+        new_like.save()
+    # Отправка ответа о том, что лайк успешно создан, и статутс код 201
+    return Response({"detail": "Лайк успешно создан"}, status.HTTP_201_CREATED)
 

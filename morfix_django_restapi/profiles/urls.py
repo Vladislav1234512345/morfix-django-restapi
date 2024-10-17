@@ -22,4 +22,7 @@ urlpatterns = [
     path('search-profiles/', views.search_profiles, name='search-profiles'),
     path('full-info/', views.profile_full_info, name='full-info'),
     path('', views.ProfileRetrieveView.as_view(), name='info'),
+
+    # Пути для чатов
+    path('create-chat/', views.create_chat, name='create-chat'),
 ]
