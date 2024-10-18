@@ -80,8 +80,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         chat_user = ChatUser.objects.get(chat=chat, user=user)
         # Обновляем поле date_joined
         chat_user.last_seen = timezone.now()
-        # Сохраняем экземпляр
-        chat_user.save()
+        # Сохраняем изменение только поля last_seen у модели chat_user
+        chat_user.save(update_fields=["last_seen"])
 
 
     # Receive message from room group

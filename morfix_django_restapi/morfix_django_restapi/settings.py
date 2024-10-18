@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 # Application definition
 INSTALLED_APPS = [
     'daphne',
+    'django_celery_beat',
     'users',
     'profiles',
     'chats',
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.ActiveUserMiddleware',
 ]
 
 # # Разрешить все источники
@@ -131,8 +133,8 @@ DATABASES = {
         'NAME': 'morfix_django_restapi',
         'USER': 'postgres',
         'PASSWORD': 'root',
-        # 'HOST': 'localhost',
-        'HOST': 'db',
+        'HOST': 'localhost',
+        # 'HOST': 'db',
         'PORT': '5432',
     }
 }
@@ -218,6 +220,22 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_REFRESH_NAME': 'refresh_token',  # Название cookie для refresh токена
     'AUTH_COOKIE_SECURE': False,  # Защищенность куки
 }
+
+
+# Настройки для Celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_TIMEZONE = 'UTC'
+
+CELERY_BEAT_SCHEDULE = {
+    'mark-inactive-every-minute': {
+        'task': 'your_app.tasks.mark_inactive_users',
+        'schedule': 30.0,  # Каждые пол минуты
+    },
+}
+
 
 # Настройки логирования
 # LOGGING = {

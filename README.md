@@ -668,3 +668,26 @@
             }
        ]
     }
+   3. Websockets чатов:
+   url = ws://127.0.0.1:8000/ws/chat/<chat_id>/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+           "message": "", # Текст сообщения
+           "media": "" # Медиа сообщения
+       },
+    }
+    response = {
+       "json": {
+           "message": "", # Текст сообщения
+           "media": "" # Медиа сообщения
+       }
+    }

@@ -19,6 +19,7 @@ services:
     depends_on:
       - db
       - redis
+      - celery
 
   db:
     image: postgres
@@ -37,6 +38,41 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+
+  celery:
+    image: vladislav1234512345/morfix-django-restapi:1.1.1
+    command: >
+      sh -c "celery -A your_project worker --loglevel=info"
+    environment:
+      - DEBUG=1
+      - DB_NAME=morfix_django_restapi
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+
+  celery-beat:
+    image: vladislav1234512345/morfix-django-restapi:1.1.1
+    command: >
+      sh -c "celery -A your_project beat --loglevel=info"
+    environment:
+      - DEBUG=1
+      - DB_NAME=morfix_django_restapi
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+      - celery
 
 volumes:
   postgres_data:

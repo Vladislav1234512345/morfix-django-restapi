@@ -14,13 +14,13 @@ def chats_list(request):
     chats_user_data = []
 
     for chat_user in chats_user:
-        messages = Message.objects.filter(chat=chat_user.chat, datetime__gt=chat_user.last_seen)
-        last_message = messages.order_by('datetime').last()
+        unseen_messages = Message.objects.filter(chat=chat_user.chat, datetime__gt=chat_user.last_seen)
+        last_message = unseen_messages.order_by('datetime').last()
 
         chat_data = {
             'chat_id': chat_user.chat.id,
             'last_message_text': last_message.text if last_message else None,
-            'messages_length': messages.count(),
+            'messages_length': unseen_messages.count(),
             'last_seen': chat_user.last_seen,
         }
 
