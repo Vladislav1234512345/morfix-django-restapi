@@ -580,8 +580,36 @@
            }
        ]
     } 
+   14. Добавление списка хобби:
+   url = http://127.0.0.1:8000/api/profile/hobbies/add/
+   method = POST
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+           [
+               {
+                   "name": "" # Имя хобби
+               }
+           ]
+       },
+    }
+    response = {
+       "json": [
+           {
+               "id": "",
+               "name": ""
+           }
+       ]
+    } 
 
-   14. Добавление чата:
+   15. Добавление чата:
    url = http://127.0.0.1:8000/api/profile/create-chat/
    method = POST
    media type = application/json

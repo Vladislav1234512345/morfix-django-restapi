@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     # Пути до хобби профилей
     path('hobbies-list/', views.get_hobbies_list, name='hobbies-list'),
+    path('hobbies/add/', views.ProfileHobbyListCreateView.as_view(), name='profile-hobbies-add'),
     path('hobby/add/', views.ProfileHobbyCreateView.as_view(), name='hobby-add'),
     path('hobby/<int:pk>/delete/', views.ProfileHobbyDeleteView.as_view(), name='hobby-delete'),
     path('hobbies/', views.ProfileHobbyListView.as_view(), name='hobbies'),

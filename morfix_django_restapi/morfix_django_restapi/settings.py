@@ -231,7 +231,7 @@ CELERY_TIMEZONE = 'UTC'
 
 CELERY_BEAT_SCHEDULE = {
     'mark-inactive-every-minute': {
-        'task': 'your_app.tasks.mark_inactive_users',
+        'task': 'users.tasks.mark_inactive_users',
         'schedule': 30.0,  # Каждые пол минуты
     },
 }

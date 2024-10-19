@@ -20,6 +20,60 @@ from chats.models import Chat, ChatUser
 from chats.serializers import ChatSerializer
 
 
+class ProfileHobbyListCreateView(generics.ListCreateAPIView):
+    # Класс сериализатора
+    serializer_class = ProfileHobbySerializer
+    # Разрешенные классы
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Получаем профиль текущего пользователя
+        profile = get_profile(self.request)
+        profile_hobbies = ProfileHobby.objects.filter(
+            profile=profile)  # Получаем все ProfileHobby для данного пользователя
+
+        profile_hobbies_list = []
+
+        for profile_hobby in profile_hobbies:
+            profile_hobby_dict = {
+                "id": profile_hobby.id,
+                "name": profile_hobby.hobby.name,
+            }
+
+            profile_hobbies_list.append(profile_hobby_dict)
+
+        return profile_hobbies_list
+
+    def create(self, request, *args, **kwargs):
+        # Проверяем, что пришел список объектов
+        if not isinstance(request.data, list):
+            return Response({"error": "Ожидается список хобби профиля."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(request.data) == 0:
+            return Response({"error": "Список хобби не должен быть пустым."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Создаем сериализатор с контекстом запроса
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+
+        # Сохраняем данные
+        self.perform_create(serializer)
+
+        profile_hobbies_data = []
+
+        for profile_hobby in serializer.instance:
+            profile_hobbies_data.append({
+                "id": profile_hobby.id,
+                "name": profile_hobby.hobby.name,
+            })
+
+        return Response(profile_hobbies_data, status=status.HTTP_201_CREATED)
+
+    def perform_create(self, serializer):
+        # Сохраняем объекты хобби, передавая профиль
+        profile = get_profile(self.request)
+        serializer.save(profile=profile)
+
 # Класс создания хобби профиля
 class ProfileHobbyCreateView(generics.GenericAPIView):
     # Класс сериализатора
@@ -29,7 +83,7 @@ class ProfileHobbyCreateView(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         # Получение профиля
-        get_profile(self.request)
+        get_profile(request)
 
         serializer = self.get_serializer(data=request.data)
 
@@ -43,6 +97,36 @@ class ProfileHobbyCreateView(generics.GenericAPIView):
         }
 
         return Response(response, status=status.HTTP_201_CREATED)
+
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def add_profile_hobbies(request):
+#     get_profile(request)
+#
+#     # Проверяем, что пришел список объектов
+#     if not isinstance(request.data, list):
+#         return Response({"error": "Ожидается список хобби профиля."}, status=status.HTTP_400_BAD_REQUEST)
+#
+#     if len(request.data) == 0:
+#         return Response({"error": "Список хобби не должен быть пустым."}, status=status.HTTP_400_BAD_REQUEST)
+#
+#     serializer = ProfileHobbySerializer(data=request.data, many=True)
+#
+#     serializer.is_valid(raise_exception=True)
+#
+#     profile_hobbies = serializer.save()
+#
+#     profile_hobbies_data = []
+#
+#     for profile_hobby in profile_hobbies:
+#         profile_hobbies_data.append({
+#             "id": profile_hobby.id,
+#             "name": profile_hobby.hobby.name,
+#         })
+#
+#     return Response(profile_hobbies_data, status=status.HTTP_201_CREATED)
+
 
 
 class ProfileHobbyListView(generics.ListAPIView):
@@ -106,8 +190,6 @@ def get_hobbies_list(request):
     return Response(hobbies_list_data, status=status.HTTP_200_OK)
 
 
-
-
 # Класс создания изображения профиля
 class ProfileImageCreateView(generics.CreateAPIView):
     # Класс сериализатора
@@ -126,6 +208,12 @@ class ProfileImageCreateView(generics.CreateAPIView):
 
         # Создаем объект, в данном случае объект profile_image
         self.perform_create(serializer)
+
+        # Если данный экземпляр изображения профиля являеться главным,
+        # тогда изменяем все другие экземпляры изображений профиля, которые были главными
+        if serializer.data["is_main_image"] == True:
+                profile_images = ProfileImage.objects.filter(is_main_image=True).exclude(id=serializer.data["id"])
+                profile_images.update(is_main_image=False)
 
         # Получаем заголовки при успешном выполнении
         headers = self.get_success_headers(serializer.data)
@@ -164,6 +252,12 @@ class ProfileImageUpdateView(generics.UpdateAPIView):
 
         # Обновляем объект, в данном случае профиль
         self.perform_update(serializer)
+
+        # Если данный экземпляр изображения профиля являеться главным,
+        # тогда изменяем все другие экземпляры изображений профиля, которые были главными
+        if serializer.data["is_main_image"] == True:
+                profile_images = ProfileImage.objects.filter(is_main_image=True).exclude(id=serializer.data["id"])
+                profile_images.update(is_main_image=False)
 
         # Возвращаем ответ с данными, заголовками и статусом кода
         return Response(serializer.data, status=status.HTTP_200_OK)

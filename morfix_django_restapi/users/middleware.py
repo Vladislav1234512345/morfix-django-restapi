@@ -13,8 +13,8 @@ class ActiveUserMiddleware(MiddlewareMixin):
             # Текущий пользователь из запроса
             user = request.user
             # Последняя активность пользователя = сейчас
-            user.last_active = now
+            user.last_activity = now
             # Активность пользователя = да
             user.is_active = True
             # Сохраняем изменение только нескольких полей
-            user.save(update_fields=['last_active', 'is_active'])
+            user.save(update_fields=['last_activity', 'is_active'])
