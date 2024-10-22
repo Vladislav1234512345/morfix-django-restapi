@@ -29,6 +29,11 @@
    3. Запустить docker-compose.yml:
    docker-compose up --build
 
+    4. Добавить бд в изображение postgres:
+    docker-compose exec db sh
+    psql -U postgres
+    create database morfix_django_restapi;
+
 
 
 

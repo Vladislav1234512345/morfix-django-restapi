@@ -15,9 +15,9 @@ def update_inactive_users():
     # Получаем всех пользователей, которые станут неактивными
     inactive_users = User.objects.filter(
         # Поле is_active должно быть True
-        is_active=True,
+        is_online=True,
         # Последння активность пользователя < дата и время сейчас - время ожидания
         last_activity__lt=now - last_activity_threshold
     )
-    # Обновления неактивных пользователей: is_active поле становиться False
-    inactive_users.update(is_active=False)
+    # Обновления неактивных пользователей: is_online поле становиться False
+    inactive_users.update(is_online=False)

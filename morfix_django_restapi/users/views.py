@@ -117,6 +117,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
             del response.data['refresh']
 
+            response.data['user'] = UserSerializer(user).data
+
         return response
 
 
