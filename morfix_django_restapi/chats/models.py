@@ -5,8 +5,8 @@ from users.models import User
 # Create your models here.
 
 class ChatUser(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    chat = models.ForeignKey('Chat', on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    chat = models.ForeignKey('Chat', on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
     invite_reason = models.CharField(max_length=255)
     last_seen = models.DateTimeField(auto_now=True)
@@ -27,7 +27,7 @@ class Chat(models.Model):
     users = models.ManyToManyField(User, related_name='chats', through='ChatUser')
 
     def __str__(self):
-        return self.id
+        return f"{self.id}"
 
     class Meta:
         db_table = 'chats'

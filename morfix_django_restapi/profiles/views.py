@@ -200,7 +200,7 @@ class ProfileImageCreateView(generics.CreateAPIView):
     # Создание объекта сериализатора
     def create(self, request, *args, **kwargs):
         # Получение профиля
-        get_profile(self.request)
+        profile = get_profile(self.request)
         # Получаем сериализатор
         serializer = self.get_serializer(data=request.data)
         # Проверяем данные сериализатора
@@ -212,7 +212,10 @@ class ProfileImageCreateView(generics.CreateAPIView):
         # Если данный экземпляр изображения профиля являеться главным,
         # тогда изменяем все другие экземпляры изображений профиля, которые были главными
         if serializer.data["is_main_image"] == True:
-                profile_images = ProfileImage.objects.filter(is_main_image=True).exclude(id=serializer.data["id"])
+                profile_images = ProfileImage.objects.filter(
+                    profile=profile,
+                    is_main_image=True
+                ).exclude(id=serializer.data["id"])
                 profile_images.update(is_main_image=False)
 
         # Получаем заголовки при успешном выполнении
@@ -256,7 +259,10 @@ class ProfileImageUpdateView(generics.UpdateAPIView):
         # Если данный экземпляр изображения профиля являеться главным,
         # тогда изменяем все другие экземпляры изображений профиля, которые были главными
         if serializer.data["is_main_image"] == True:
-                profile_images = ProfileImage.objects.filter(is_main_image=True).exclude(id=serializer.data["id"])
+                profile_images = ProfileImage.objects.filter(
+                    profile=instance.profile,
+                    is_main_image=True
+                ).exclude(id=serializer.data["id"])
                 profile_images.update(is_main_image=False)
 
         # Возвращаем ответ с данными, заголовками и статусом кода
@@ -527,19 +533,22 @@ def search_profiles(request):
 
 
 @api_view(['POST'])
-@permission_classes
+@permission_classes([IsAuthenticated])
 def create_chat(request):
     # Получение объекта профиля
     profile = get_profile(request)
     # Получение объекта пользователя из запроса
     user = request.user
     # Получение id профиля из post запроса
-    profile_id = request.POST.get("profile_id")
+    profile_id = request.data.get("profile_id")
+
+    if profile.id == profile_id:
+        return Response({"detail": "Нельзя отправить лайк самому себе."}, status=status.HTTP_400_BAD_REQUEST)
 
     # Проверка существует ли желанный профиль
     try:
         # Получения профиля по его id
-        searching_profile = Profile.objects.get(pk=profile_id)
+        searching_profile = Profile.objects.get(id=profile_id)
     except Profile.DoesNotExist:
         # Отправка ответа с статусом кода 404 в случае, если профиля не существует
         return Response({"detail": "Анкеты, которая понравилась, не существует."}, status=status.HTTP_404_NOT_FOUND)
