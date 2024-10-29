@@ -667,10 +667,11 @@
     response = {
        "json": [
             {
-                'chat_id': "",
-                'last_message_text': "",
-                'messages_length': "",
-                'last_seen': ""
+                "chat_id": 1,
+                "last_message_text": "Афигеть",
+                "last_message_datetime": 17:20,
+                "unseen_messages_length": 0,
+                "profile_first_name": ""
             }
        ]
     }
