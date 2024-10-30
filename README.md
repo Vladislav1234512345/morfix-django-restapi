@@ -672,6 +672,7 @@
                 "last_message_datetime": 17:20,
                 "unseen_messages_length": 0,
                 "profile_first_name": ""
+                "profile_first_image": "http://..."
             }
        ]
     }

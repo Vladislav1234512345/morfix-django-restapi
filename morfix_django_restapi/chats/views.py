@@ -6,7 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Chat, Message, ChatUser
 from .serializers import ChatSerializer, MessageSerializer
 
-from profiles.models import Profile
+from profiles.models import Profile, ProfileImage
+
+from profiles.serializers import ProfileImageSerializer
 
 # Представление списка чатов
 @api_view(['GET'])
@@ -35,8 +37,26 @@ def chats_list(request):
                 profile_first_name = "Вы"
             else:
                 profile_first_name = profile.first_name
+
         except Profile.DoesNotExist:
             profile_first_name = None
+
+        try:
+            # Экземпляр данного чата пользователя собеседника
+            this_chat_other_user = ChatUser.objects.filter(
+                chat=chat_user.chat
+            ).exclude(user=chat_user.user).first()
+            # Экземпляра профиля собеседника
+            chat_profile = Profile.objects.get(user=this_chat_other_user.user)
+            # Экзмемпляр фото прфоиля собеседника
+            profile_image = ProfileImageSerializer(
+                ProfileImage.objects.get(
+                    profile=chat_profile,
+                    is_main_image=True,
+                )
+            ).data.get("image")
+        except:
+            profile_image = None
 
         # Словарь с данными чата
         chat_data = {
@@ -45,6 +65,7 @@ def chats_list(request):
             'last_message_datetime': last_message.datetime.strftime('%H:%M') if last_message else None, # Дата и время последнего сообщений
             'unseen_messages_length': unseen_messages.count(), # Количество непрочитанных сообщений в масле
             'profile_first_name': profile_first_name, # Имя профиля последнего сообщения в чате
+            'profile_image': profile_image, # Изображение профиля собеседника чата
         }
         # Добавление словаря в список
         chats_user_data.append(chat_data)
