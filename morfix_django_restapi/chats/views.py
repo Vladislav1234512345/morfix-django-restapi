@@ -38,7 +38,7 @@ def chats_list(request):
             else:
                 profile_first_name = profile.first_name
 
-        except Profile.DoesNotExist:
+        except:
             profile_first_name = None
 
         try:
