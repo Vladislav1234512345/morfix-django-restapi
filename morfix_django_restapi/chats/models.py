@@ -36,8 +36,8 @@ class Chat(models.Model):
 
 
 class Message(models.Model):
-    chat = models.ForeignKey('Chat', on_delete=models.PROTECT, related_name="messages")
-    sender = models.ForeignKey(User, on_delete=models.PROTECT)
+    chat = models.ForeignKey('Chat', on_delete=models.CASCADE, related_name="messages")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
     datetime = models.DateTimeField(auto_now=True)
     text = models.TextField(max_length=5000)
     media = models.FileField(upload_to='chat_media/', blank=True, null=True)  # Поле для медиафайлов
