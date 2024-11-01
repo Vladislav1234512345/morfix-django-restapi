@@ -668,11 +668,12 @@
        "json": [
             {
                 "chat_id": 1,
-                "last_message_text": "Афигеть",
-                "last_message_datetime": 17:20,
-                "unseen_messages_length": 0,
-                "profile_first_name": ""
-                "profile_first_image": "http://..."
+                "other_profile_image": "/media/profiles/images/....jpg",
+                "other_profile_first_name": "Vladislav",
+                "last_message_first_name": "Вы",
+                "last_message_text": "last message test",
+                "last_message_datetime": "14:48",
+                "unseen_messages_length": 0
             }
        ]
     }

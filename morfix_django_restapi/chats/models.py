@@ -49,4 +49,4 @@ class Message(models.Model):
 
 
     def __str__(self):
-        return f"{self.sender} - {self.id}"
+        return f"{self.sender.username} - {self.chat.id}"

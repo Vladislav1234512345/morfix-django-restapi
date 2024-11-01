@@ -29,17 +29,16 @@ def chats_list(request):
         unseen_messages = messages.filter(datetime__gt=chat_user.last_seen)
 
         try:
-            # Получение профиля отправителя последнего сообщения
-            profile = Profile.objects.get(user=last_message.sender)
             # Если отправитель последнего сообщения равен текущему пользователю
             if last_message.sender == request.user:
-                # Объявление и присвоение значения переменной profile_first_name
-                profile_first_name = "Вы"
+                # Объявление и присвоение значения переменной last_message_first_name
+                last_message_first_name = "Вы"
             else:
-                profile_first_name = profile.first_name
-
+                # Получение профиля отправителя последнего сообщения
+                profile = Profile.objects.get(user=last_message.sender)
+                last_message_first_name = profile.first_name
         except:
-            profile_first_name = None
+            last_message_first_name = None
 
         try:
             # Экземпляр данного чата пользователя собеседника
@@ -47,25 +46,36 @@ def chats_list(request):
                 chat=chat_user.chat
             ).exclude(user=chat_user.user).first()
             # Экземпляра профиля собеседника
-            chat_profile = Profile.objects.get(user=this_chat_other_user.user)
+            chat_other_profile = Profile.objects.get(user=this_chat_other_user.user)
+        except:
+            chat_other_profile = None
+
+        try:
+            # Получение имени собеседника чата
+            other_profile_first_name = chat_other_profile.first_name
+        except:
+            other_profile_first_name = None
+
+        try:
             # Экзмемпляр фото прфоиля собеседника
-            profile_image = ProfileImageSerializer(
+            other_profile_image = ProfileImageSerializer(
                 ProfileImage.objects.get(
-                    profile=chat_profile,
+                    profile=chat_other_profile,
                     is_main_image=True,
                 )
             ).data.get("image")
         except:
-            profile_image = None
+            other_profile_image = None
 
         # Словарь с данными чата
         chat_data = {
             'chat_id': chat_user.chat.id, # ID чата
+            'other_profile_image': other_profile_image,  # Изображение профиля собеседника чата
+            'other_profile_first_name': other_profile_first_name,  # Имя профиля собеседника чата
+            'last_message_first_name': last_message_first_name,  # Имя профиля последнего сообщения в чате
             'last_message_text': last_message.text if last_message else None,# Текст последнего сообщения
             'last_message_datetime': last_message.datetime.strftime('%H:%M') if last_message else None, # Дата и время последнего сообщений
             'unseen_messages_length': unseen_messages.count(), # Количество непрочитанных сообщений в масле
-            'profile_first_name': profile_first_name, # Имя профиля последнего сообщения в чате
-            'profile_image': profile_image, # Изображение профиля собеседника чата
         }
         # Добавление словаря в список
         chats_user_data.append(chat_data)
