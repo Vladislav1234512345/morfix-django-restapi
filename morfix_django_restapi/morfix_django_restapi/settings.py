@@ -63,7 +63,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'users.middleware.ActiveUserMiddleware',
 ]
 
 # # Разрешить все источники
@@ -235,6 +234,6 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BEAT_SCHEDULE = {
     'mark-inactive-every-minute': {
         'task': 'users.tasks.update_inactive_users',
-        'schedule': 30.0,  # Каждые пол минуты
+        'schedule': 10,  # Каждую четверь минуты
     },
 }

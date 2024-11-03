@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 urlpatterns = [
+    path('heartbeat/', views.UserHeartBeatView.as_view(), name='heartbeat'), # Обновление последней активности пользователя
     path('register/', views.UserRegisterView.as_view(), name='register'), # Регистрация нового пользователя
     path('update/', views.UserUpdateView.as_view(), name='update'), # Обновление пользователя
     path('login/', views.CustomTokenObtainPairView.as_view(), name='login'), # Для получения access и refresh токенов при авторизации

@@ -118,7 +118,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 message_id = data.get("message_id", None)
 
                 # Удаление экземпляра сообщения
-                message = await self.delete_message(message_id=message_id)
+                await self.delete_message(message_id=message_id)
 
                 # Обновление поля "last_seen" экземпляра чата данного пользователя
                 await self.update_chat_user(user=user, chat=chat)

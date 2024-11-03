@@ -200,6 +200,30 @@
            }
        }
    }
+   8. Обновление активности пользователя:
+   url = http://127.0.0.1:8000/api/user/heartbeat/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+        }
+   }
+   response = {
+       "json": {
+           "detail": "Активность текущего пользователя успешно обновлена."
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       }
+   }
 
 
 
@@ -720,15 +744,38 @@
        "json": [
             {
                 'id': "",
-                'chat': "",
-                'sender': "",
+                'chat_id': "",
+                'sender_id': "",
                 'datetime': "",
                 'text': "",
                 'media': ""
             }
        ]
     }
-   3. Websockets чатов:
+   3. Маршрут активности пользователей-собеседников чатов:
+   url = http://127.0.0.1:8000/api/chat/users-activity/
+   method = GET
+   media type = application/json
+   content = {
+       "headers": {
+            "Authorization": "Bearer <jwt>"
+       },
+       "cookies": {
+               "refresh_token": ""
+           }
+       },
+        "body": {
+       },
+    }
+    response = {
+       "json": [
+            {
+                "chat_id": 4,
+                "other_user_is_online": true
+            }
+       ]
+    }
+   4. Websockets чатов:
    url = ws://127.0.0.1:8000/ws/chat/<chat_id>/
    method = GET
    media type = application/json

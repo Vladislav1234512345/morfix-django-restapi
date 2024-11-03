@@ -12,10 +12,10 @@ class ChatSerializer(serializers.ModelSerializer):
 class ChatUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatUser
-        fields = ['id', 'chat', 'user', 'date_joined', 'invite_reason', 'last_seen']
+        fields = ['id', 'chat_id', 'user_id', 'date_joined', 'invite_reason', 'last_seen']
 
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ['id', 'chat', 'sender', 'datetime', 'text', 'media']
+        fields = ['id', 'chat_id', 'sender_id', 'datetime', 'text', 'media']
