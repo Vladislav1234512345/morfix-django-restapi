@@ -75,7 +75,7 @@ def chats_list(request):
             'last_message_first_name': last_message_first_name,  # Имя профиля последнего сообщения в чате
             'last_message_text': last_message.text if last_message else None,# Текст последнего сообщения
             'last_message_datetime': last_message.datetime.strftime('%H:%M') if last_message else None, # Дата и время последнего сообщений
-            'unseen_messages_length': unseen_messages.count(), # Количество непрочитанных сообщений в масле
+            'unseen_messages_length': unseen_messages.count(), # Количество непрочитанных сообщений в чате
         }
         # Добавление словаря в список
         chats_user_data.append(chat_data)

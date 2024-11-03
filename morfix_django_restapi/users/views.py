@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.views import APIView
 
 from .serializers import UserSerializer
 
@@ -136,11 +137,12 @@ class UserDeleteView(generics.DestroyAPIView):
         self.perform_destroy(user)
 
         # Возвращаем успешный ответ после удаления пользователя
-        return Response({"detail": "Ваш аккаунт был успешно удален."}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail": "Ваш аккаунт был успешно удален."}, status=status.HTTP_200_OK)
 
 
 
 class CustomTokenRefreshView(TokenRefreshView):
+
     def get(self, request, *args, **kwargs):
         # Извлечение refresh токена из куков
         refresh_token = request.COOKIES.get(settings.SIMPLE_JWT.get('AUTH_COOKIE_REFRESH_NAME', 'refresh_token'))
@@ -171,4 +173,18 @@ class CustomTokenRefreshView(TokenRefreshView):
 
                 del response.data['refresh']
 
+        return response
+
+
+
+class UserLogoutView(APIView):
+    # Для удаления refresh токена пользователя необходимо, чтобы он был аутентифицирован
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Создать объект ответа
+        response = Response({"detail": "Refresh токен пользователя успешно удалён!"}, status=status.HTTP_200_OK)
+        # Удалить refresh токен из cookies
+        response.delete_cookie(settings.SIMPLE_JWT.get('AUTH_COOKIE_REFRESH_NAME', 'refresh_token'))
+        # Вернуть ответ
         return response

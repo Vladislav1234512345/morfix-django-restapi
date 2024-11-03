@@ -66,7 +66,7 @@ class Profile(models.Model):
 
 
 class ProfileImage(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.PROTECT, related_name='images')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(verbose_name='Изображение', upload_to='profiles/images/', null=False)
     uploaded_at = models.DateTimeField(verbose_name='Дата загрузки', auto_now_add=True)
     is_main_image = models.BooleanField(verbose_name='Изображение профиля', default=False)
@@ -94,8 +94,8 @@ class Hobby(models.Model):
 
 
 class ProfileHobby(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.PROTECT, related_name='profile_hobbies')
-    hobby = models.ForeignKey(Hobby, on_delete=models.PROTECT, related_name='hobby_profiles')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='profile_hobbies')
+    hobby = models.ForeignKey(Hobby, on_delete=models.CASCADE, related_name='hobby_profiles')
 
     class Meta:
         db_table = 'profile_hobbies'
