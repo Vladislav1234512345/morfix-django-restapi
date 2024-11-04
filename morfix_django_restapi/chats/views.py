@@ -1,5 +1,7 @@
+from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Chat, Message, ChatUser
@@ -55,13 +57,19 @@ def chats_list(request):
 
         try:
             # Экзмемпляр фото прфоиля собеседника
-            other_profile_image = ProfileImage.objects.get(profile=other_profile, is_main_image=True).image
+            other_profile_image = ProfileImageSerializer(
+                ProfileImage.objects.get(
+                    profile=other_profile,
+                    is_main_image=True
+                )
+            ).data.get("image")
         except:
             other_profile_image = None
 
         # Словарь с данными чата
         chat_data = {
             'chat_id': chat.id, # ID чата
+            'other_profile_id': other_profile.id, # ID профиля собеседника
             'other_profile_image': other_profile_image,  # Изображение профиля собеседника чата
             'other_profile_first_name': other_profile_first_name,  # Имя профиля собеседника чата
             'last_message_first_name': last_message_first_name,  # Имя профиля последнего сообщения в чате
@@ -92,6 +100,21 @@ def chat_room(request, chat_id):
         messages_data,
         status=status.HTTP_200_OK
     )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_chat(request, chat_id):
+    try:
+        chat = Chat.objects.get(id=chat_id)
+    except Chat.DoesNotExist:
+        raise Http404({"detail": "Данного чата не существует."})
+
+    if request.user not in chat.users.all():
+        return Response({"detail": "У вас нет прав удалить данный чат."}, status=status.HTTP_403_FORBIDDEN)
+
+    chat.delete()
+
+    return Response({"detail": "Чат успешно удален."}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

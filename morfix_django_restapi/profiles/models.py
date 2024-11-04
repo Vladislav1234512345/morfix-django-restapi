@@ -122,7 +122,10 @@ class Like(models.Model):
 
 
     def __str__(self):
-        return self.type
+        return (
+            f"отправитель: {self.sender.user.username }\n"
+            f"получатель: {self.receiver.user.username}"
+        )
 
     class Meta:
         db_table = 'likes'

@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Profile, ProfileImage, Hobby, ProfileHobby
+from . import models
 
 # Register your models here.
 
-admin.site.register(Profile)
-admin.site.register(ProfileImage)
-admin.site.register(ProfileHobby)
-admin.site.register(Hobby)
+admin.site.register(models.Profile)
+admin.site.register(models.ProfileImage)
+admin.site.register(models.ProfileHobby)
+admin.site.register(models.Hobby)
+admin.site.register(models.Like)

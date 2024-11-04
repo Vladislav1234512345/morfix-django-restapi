@@ -2,8 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import get_object_or_404
 
-from .models import Profile, ProfileImage, Hobby, ProfileHobby
-from .functions import get_profile
+from .models import Profile, ProfileImage, Hobby, ProfileHobby, Like
 
 # Сериализатора для хобби
 class HobbySerializer(serializers.ModelSerializer):
@@ -20,7 +19,10 @@ class ProfileHobbySerializer(serializers.ModelSerializer):  # Используе
         fields = ('id', 'name')
 
     def create(self, validated_data):
-        profile = get_profile(self.context.get("request"))
+        try:
+            profile = get_object_or_404(ProfileHobby, name=validated_data['name'])
+        except Profile.DoesNotExist:
+            raise NotFound({"detail": "Профиля не существует"})
         hobby_name = validated_data['name']
 
         # Проверяем, существует ли хобби
@@ -125,3 +127,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+# Класс сериализатора лайка
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        # Модель сериализатора
+        model = Like
+        # Поля сериализатора
+        fields = ('id', 'type', 'receiver_id', 'sender_id')

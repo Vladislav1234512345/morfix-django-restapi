@@ -1,7 +1,6 @@
 from django.urls import path
 
 from . import views
-
 urlpatterns = [
     # Пути до хобби профилей
     path('hobbies-list/', views.get_hobbies_list, name='hobbies-list'),
@@ -21,9 +20,13 @@ urlpatterns = [
     path('create/', views.ProfileCreateView.as_view() , name='create'),
     path('update/', views.ProfileUpdateView.as_view() , name='update'),
     path('search-profiles/', views.search_profiles, name='search-profiles'),
-    path('full-info/', views.profile_full_info, name='full-info'),
+    path('full-info/me/', views.my_profile_full_info, name='my-full-info'),
+    path('full-info/<int:profile_id>/', views.profile_full_info, name='full-info'),
     path('', views.ProfileRetrieveView.as_view(), name='info'),
 
-    # Пути для чатов
-    path('create-chat/', views.create_chat, name='create-chat'),
+    # Пути для лайков
+    path('likes/', views.received_likes_profiles, name='likes'), # Список лайков, которые были получены текущем профилем
+    path('like/<int:pk>/delete/', views.delete_received_like, name='like-delete'), # Удаление лайка
+    path('like/create/', views.create_like, name='like-create'), # Создание лайка
 ]
+

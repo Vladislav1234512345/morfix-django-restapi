@@ -2,6 +2,7 @@ import random
 
 from datetime import date
 
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
@@ -10,8 +11,9 @@ from rest_framework.response import Response
 
 from django.utils import timezone
 
-from .functions import get_profile
-from .serializers import ProfileSerializer, ProfileImageSerializer, ProfileHobbySerializer, HobbySerializer
+from .functions import get_profile, get_profile_full_info_data
+from .serializers import ProfileSerializer, ProfileImageSerializer, ProfileHobbySerializer, HobbySerializer, \
+    LikeSerializer
 
 from .models import Profile, ProfileImage, Hobby, ProfileHobby, Like
 
@@ -417,38 +419,34 @@ class ProfileRetrieveView(generics.RetrieveAPIView):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def profile_full_info(request):
-    # Получение объекта профиля или ошибка 404
-    profile = get_profile(request)
-    # Получение данных профиля
-    profile_data = ProfileSerializer(profile).data
+def profile_full_info(request, profile_id):
+    try:
+        # Экземпляр профиля по его id
+        profile = Profile.objects.get(id=profile_id)
+        if profile.user == request.user:
+            return Response(
+                {
+                    "detail": "Для просмотра профиля текущего пользователя используйте /full-info/me/ ednpoint."
+                },
+                status=status.HTTP_200_OK
+            )
+    except:
+        return Response({"detail": "Данный профиль не найден."}, status=status.HTTP_404_NOT_FOUND)
 
-
-    profile_hobbies = ProfileHobby.objects.filter(profile=profile).all()
-
-    profile_hobbies_data = []
-
-    for profile_hobby in profile_hobbies:
-        profile_hobby_dict = {
-            "id": profile_hobby.id,
-            "name": profile_hobby.hobby.name,
-        }
-
-        profile_hobbies_data.append(profile_hobby_dict)
-
-    profile_data["hobbies"] = profile_hobbies_data
-
-
-    profile_images = ProfileImage.objects.filter(profile=profile).all()
-
-    profile_images_data = ProfileImageSerializer(profile_images, many=True).data
-
-    profile_data["images"] = profile_images_data
-
+    # Получение полных данных профиля
+    profile_data = get_profile_full_info_data(profile)
 
     return Response(profile_data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_profile_full_info(request):
+    # Получение экземпляра профиля текущего пользователя
+    profile = get_profile(request)
+    # Получение полных данных профиля
+    profile_data = get_profile_full_info_data(profile)
 
+    return Response(profile_data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -492,36 +490,8 @@ def search_profiles(request):
 
     # Цикл из подходящих профилей
     for searching_profile in searching_profiles:
-        # Данные подходящего профиля из сериализатора
-        searching_profile_data = ProfileSerializer(searching_profile).data
-
-
-        #  Получаем все хобби профиля
-        searching_profile_hobbies = ProfileHobby.objects.filter(profile=searching_profile)
-
-        # Данные хобби профиля
-        searching_profile_hobbies_data = []
-
-        for searching_profile_hobby in searching_profile_hobbies:
-            searching_profile_hobby_dict = {
-                "id": searching_profile_hobby.id,
-                "name": searching_profile_hobby.hobby.name,
-            }
-
-            searching_profile_hobbies_data.append(searching_profile_hobby_dict)
-
-        # Добавление хобби данному профилю в сериализатор
-        searching_profile_data["hobbies"] = searching_profile_hobbies_data
-
-
-        # Изображение подходящих профилей
-        searching_profile_images = ProfileImage.objects.filter(profile=searching_profile)
-        # Данные изображений подходящих профилей из сериализатора
-        searching_profile_images_data = ProfileImageSerializer(searching_profile_images, many=True).data
-        # Добавление в данные подходящего профиля из сериализатора поля images,
-        # который является данными изображений подходящего профиля
-        searching_profile_data["images"] = searching_profile_images_data
-
+        # Получение полной информации искомого профиля
+        searching_profile_data = get_profile_full_info_data(searching_profile)
 
         # Добавление данных подходящего профиля в список подходящих профилей
         searching_profiles_data.append(searching_profile_data)
@@ -531,10 +501,53 @@ def search_profiles(request):
 
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def received_likes_profiles(request):
+    # Получение экземпляра профиля текущего пользователя
+    current_profile = get_profile(request)
+    # Получение всех лайков данного профиля
+    current_profile_likes = current_profile.received_likes.all()
+    senders_likes_profiles_data = []
+    # Цикл лайков данного профиля
+    for current_profile_like in current_profile_likes:
+        sender_like_profile_data = {
+            # Получение данных текущего лайка профиля
+            "like": LikeSerializer(current_profile_like).data,
+            # Получение полных данных профиля, который отправил лайк профилю текущего пользователя
+            "profile": get_profile_full_info_data(current_profile_like.sender),
+        }
+        # Добавление данных профиля в список всех данных профилей, которые лайкнули профиль текущего пользователя
+        senders_likes_profiles_data.append(sender_like_profile_data)
+
+    return Response(senders_likes_profiles_data, status=status.HTTP_200_OK)
+
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_received_like(request, pk):
+    try:
+        current_like = Like.objects.get(pk=pk)
+    except Like.DoesNotExist:
+        raise Http404({"detail": "Данного лайка не существует."})
+
+    if current_like.receiver.user == request.user:
+        current_like.delete()
+
+        return Response({"detail": "Лайк успешно удален."}, status=status.HTTP_200_OK)
+
+    elif current_like.sender.user == request.user:
+        return Response({"detail": "Вы не можете удалить свой лайк."}, status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        return Response({"detail": "У вас нету права удалить чужой лайк."}, status=status.HTTP_403_FORBIDDEN)
+
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_chat(request):
+def create_like(request):
     # Получение объекта профиля
     profile = get_profile(request)
     # Получение объекта пользователя из запроса
@@ -593,5 +606,5 @@ def create_chat(request):
         # Отправка ответа о том, что лайк успешно создан, и статутс код 201
         return Response({"detail": "Лайк успешно создан."}, status=status.HTTP_201_CREATED)
 
-    return Response({"detail": "Лайк уже был отправлен."}, status=status.HTTP_200_OK)
+    return Response({"detail": "Лайк уже был отправлен."}, status=status.HTTP_400_BAD_REQUEST)
 
