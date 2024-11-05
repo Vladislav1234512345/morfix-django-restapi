@@ -606,5 +606,5 @@ def create_like(request):
         # Отправка ответа о том, что лайк успешно создан, и статутс код 201
         return Response({"detail": "Лайк успешно создан."}, status=status.HTTP_201_CREATED)
 
-    return Response({"detail": "Лайк уже был отправлен."}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"detail": "Лайк уже был создан."}, status=status.HTTP_200_OK)
 

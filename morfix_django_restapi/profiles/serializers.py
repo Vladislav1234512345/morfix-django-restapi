@@ -20,7 +20,7 @@ class ProfileHobbySerializer(serializers.ModelSerializer):  # Используе
 
     def create(self, validated_data):
         try:
-            profile = get_object_or_404(ProfileHobby, name=validated_data['name'])
+            profile = Profile.objects.get(user=self.context.get("request").user)
         except Profile.DoesNotExist:
             raise NotFound({"detail": "Профиля не существует"})
         hobby_name = validated_data['name']
