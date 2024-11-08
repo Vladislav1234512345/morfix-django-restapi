@@ -14,6 +14,10 @@ from pathlib import Path
 
 from datetime import timedelta
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,22 +32,13 @@ SECRET_KEY = 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l
 DEBUG = True
 
 # Разрешенные хосты
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 INSTALLED_APPS = [
     'daphne',
-    'django_celery_beat',
-    'users',
-    'profiles',
-    'chats',
-
-    'corsheaders',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,6 +47,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
 
+    # Сторонние приложения
+    'django_celery_beat',
+    'channels',
+    'corsheaders',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+
+    # Локальные приложения
+    'users',
+    'profiles',
+    'chats',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +79,8 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True  # Разрешить передачу данных в куках
@@ -132,8 +141,8 @@ DATABASES = {
         'NAME': 'morfix_django_restapi',
         'USER': 'postgres',
         'PASSWORD': 'root',
-        # 'HOST': 'localhost',
-        'HOST': 'db',
+        'HOST': 'localhost',
+        # 'HOST': 'db',
         'PORT': '5432',
     }
 }
@@ -189,8 +198,8 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis", 6379)],
-            # "hosts": [("localhost", 6379)],
+            # "hosts": [("redis", 6379)],
+            "hosts": [("localhost", 6379)],
         },
     },
 }
@@ -235,5 +244,28 @@ CELERY_BEAT_SCHEDULE = {
     'mark-inactive-every-minute': {
         'task': 'users.tasks.update_inactive_users',
         'schedule': 10,  # Каждую четверь минуты
+    },
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',  # Устанавливаем уровень для сообщений
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Уровень логирования для всего Django
+            'propagate': True,
+        },
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Уровень логирования для всех остальных логеров
+            'propagate': True,
+        },
     },
 }

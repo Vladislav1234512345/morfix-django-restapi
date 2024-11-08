@@ -84,6 +84,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             'birthday',
             'dating_purpose',
             'searching_gender',
+            'position',
+            'location',
             'description',
             'smokes_cigarettes',
             'drinks_alcoholics',
@@ -112,8 +114,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.gender = validated_data.get('gender', instance.gender)
         instance.birthday = validated_data.get('birthday', instance.birthday)
         instance.dating_purpose = validated_data.get('dating_purpose', instance.dating_purpose)
-        instance.description = validated_data.get('description', instance.description)
         instance.searching_gender = validated_data.get('searching_gender', instance.searching_gender)
+        instance.position = validated_data.get('position', instance.position)
+        instance.location = validated_data.get('location', instance.location)
+        instance.description = validated_data.get('description', instance.description)
         instance.smokes_cigarettes = validated_data.get('smokes_cigarettes', instance.smokes_cigarettes)
         instance.drinks_alcoholics = validated_data.get('drinks_alcoholics', instance.drinks_alcoholics)
         instance.has_children = validated_data.get('has_children', instance.has_children)
@@ -127,6 +131,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
 
 # Класс сериализатора лайка
 class LikeSerializer(serializers.ModelSerializer):

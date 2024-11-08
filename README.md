@@ -906,9 +906,81 @@
             }
        ]
     }
-   5. Websockets чатов:
-   url = ws://127.0.0.1:8000/ws/chat/<chat_id>/
-   method = GET
+      5. Websocket чата:
+      url = ws://127.0.0.1:8000/ws/chat/<chat_id>/
+      media type = application/json
+      content = {
+          "headers": {
+               "Authorization": "Bearer <jwt>"
+          },
+          "cookies": {
+                  "refresh_token": ""
+              }
+          },
+           "body": {
+                    ***Отправка сообщения***
+                    {
+                           "action": "send",
+                           "data": {
+                               "text": "",
+                               "media": null
+                           }
+                    }
+                    ***Редактирование сообщения***
+                    {
+                           "action": "edit",
+                           "data": {
+                               "message_id": 0,
+                               "text": "",
+                               "media": null
+                           }
+                    }
+                    ***Удаление сообщения***
+                    {
+                           "action": "delete",
+                           "data": {
+                               "message_id": 0
+                           }
+                    }
+          },
+       }
+       response = {
+          "json": {
+                    ***Отправка сообщения***
+                    {
+                        "action": "edit",
+                        "message": {
+                            "id": 0,
+                            "chat_id": 0,
+                            "sender_id": 0,
+                            "datetime": "2024-11-08T12:14:38.649364Z",
+                            "text": "",
+                            "media": null
+                        }
+                    }
+                    ***Редактирование сообщения***
+                    {
+                        "action": "edit",
+                        "message": {
+                            "id": 0,
+                            "chat_id": 0,
+                            "sender_id": 0,
+                            "datetime": "2024-11-08T12:14:20.028332Z",
+                            "text": "",
+                            "media": null
+                        }
+                    }
+                    ***Удаление сообщения***
+                    {
+                           {
+                                "action": "delete",
+                                "message_id": 19
+                            }
+                    }
+          }
+       }
+   6. Websocket списка чатов:
+   url = ws://127.0.0.1:8000/ws/chats/
    media type = application/json
    content = {
        "headers": {
@@ -919,17 +991,24 @@
            }
        },
         "body": {
-           "action": # Разрешенные значения: send, edit, delete
-           "data": {
-               "message_id": 1 # ID сообщения (данное поле используется только для действий: редактирование или удаление) 
-               "text": "" # Текст сообщения (данное поле используется только для действий: отправка или редактирование)
-               "media": "" # Медиа сообщения (данное поле используется только для действий: отправка или редактирование)
-           }
        },
     }
     response = {
-       "json": {
-           "message": "", # Текст сообщения
-           "media": "" # Медиа сообщения
+       "json": { 
+   ***При отправке сообщения***
+   {
+     "type": "send.event.update",
+     "chat_id": 0,
+     "last_message_first_name": "" , # Если отправитель сообщения это текущий пользователь, тогда будет значение "Вы"
+     "last_message_text": "",
+     "last_message_datetime": "2024-11-08T12:31:28.914479+00:00",
+     "unseen_messages_length": 0 
+   }
+   ***Когда был не в чате, а потом зашел в него***
+   {
+     "type": "send.event.update",
+     "chat_id": 0,
+     "unseen_messages_length": 0 
+   }
        }
     }

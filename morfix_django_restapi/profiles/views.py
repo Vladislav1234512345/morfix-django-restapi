@@ -22,29 +22,30 @@ from chats.models import Chat, ChatUser
 from chats.serializers import ChatSerializer
 
 
+
+# Класс создания списка хобби профиля
 class ProfileHobbyListCreateView(generics.ListCreateAPIView):
     # Класс сериализатора
     serializer_class = ProfileHobbySerializer
     # Разрешенные классы
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        # Получаем профиль текущего пользователя
-        profile = get_profile(self.request)
-        profile_hobbies = ProfileHobby.objects.filter(
-            profile=profile)  # Получаем все ProfileHobby для данного пользователя
-
-        profile_hobbies_list = []
-
-        for profile_hobby in profile_hobbies:
-            profile_hobby_dict = {
-                "id": profile_hobby.id,
-                "name": profile_hobby.hobby.name,
-            }
-
-            profile_hobbies_list.append(profile_hobby_dict)
-
-        return profile_hobbies_list
+    # def get_queryset(self):
+    #     # Получаем профиль текущего пользователя
+    #     profile = get_profile(self.request)
+    #     profile_hobbies = ProfileHobby.objects.filter(profile=profile)  # Получаем все ProfileHobby для данного пользователя
+    #
+    #     profile_hobbies_list = []
+    #
+    #     for profile_hobby in profile_hobbies:
+    #         profile_hobby_dict = {
+    #             "id": profile_hobby.id,
+    #             "name": profile_hobby.hobby.name,
+    #         }
+    #
+    #         profile_hobbies_list.append(profile_hobby_dict)
+    #
+    #     return profile_hobbies_list
 
     def create(self, request, *args, **kwargs):
         # Проверяем, что пришел список объектов
@@ -76,6 +77,7 @@ class ProfileHobbyListCreateView(generics.ListCreateAPIView):
         profile = get_profile(self.request)
         serializer.save(profile=profile)
 
+
 # Класс создания хобби профиля
 class ProfileHobbyCreateView(generics.GenericAPIView):
     # Класс сериализатора
@@ -101,36 +103,7 @@ class ProfileHobbyCreateView(generics.GenericAPIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def add_profile_hobbies(request):
-#     get_profile(request)
-#
-#     # Проверяем, что пришел список объектов
-#     if not isinstance(request.data, list):
-#         return Response({"error": "Ожидается список хобби профиля."}, status=status.HTTP_400_BAD_REQUEST)
-#
-#     if len(request.data) == 0:
-#         return Response({"error": "Список хобби не должен быть пустым."}, status=status.HTTP_400_BAD_REQUEST)
-#
-#     serializer = ProfileHobbySerializer(data=request.data, many=True)
-#
-#     serializer.is_valid(raise_exception=True)
-#
-#     profile_hobbies = serializer.save()
-#
-#     profile_hobbies_data = []
-#
-#     for profile_hobby in profile_hobbies:
-#         profile_hobbies_data.append({
-#             "id": profile_hobby.id,
-#             "name": profile_hobby.hobby.name,
-#         })
-#
-#     return Response(profile_hobbies_data, status=status.HTTP_201_CREATED)
-
-
-
+# Класс списка хобби профиля
 class ProfileHobbyListView(generics.ListAPIView):
     serializer_class = ProfileHobbySerializer
 
@@ -154,6 +127,7 @@ class ProfileHobbyListView(generics.ListAPIView):
         return profile_hobbies_list
 
 
+# Класс удаления хобби профиля
 class ProfileHobbyDeleteView(generics.DestroyAPIView):
     serializer_class = ProfileHobbySerializer
 
@@ -177,6 +151,8 @@ class ProfileHobbyDeleteView(generics.DestroyAPIView):
         return Response({"detail": "Хобби профиля успешно удалено."}, status=status.HTTP_200_OK)
 
 
+
+# Список всех доступных хобби
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_hobbies_list(request):
@@ -190,6 +166,35 @@ def get_hobbies_list(request):
         hobbies_list_data.append(hobby_list_data)
 
     return Response(hobbies_list_data, status=status.HTTP_200_OK)
+
+
+
+
+# Класс создания списка изображений профиля
+class ProfileImageListCreateView(generics.ListCreateAPIView):
+    # Класс сериализатора
+    serializer_class = ProfileImageSerializer
+    # Разрешенные классы
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        # Проверяем, что пришел список объектов
+        if not isinstance(request.data, list):
+            return Response({"error": "Ожидается список изображений профиля."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(request.data) == 0:
+            return Response({"error": "Список изображений не должен быть пустым."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Создаем сериализатор с контекстом запроса
+        serializer = self.get_serializer(data=request.data, many=True)
+
+        serializer.is_valid(raise_exception=True)
+
+        # Сохраняем данные
+        self.perform_create(serializer)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 
 # Класс создания изображения профиля
@@ -225,6 +230,7 @@ class ProfileImageCreateView(generics.CreateAPIView):
 
         # Возвращаем ответ с данными, заголовками и статусом кода
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 
 # Класс обновления изображения профиля
@@ -271,6 +277,7 @@ class ProfileImageUpdateView(generics.UpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+
 # Класс удаления изображения профиля
 class ProfileImageDeleteView(generics.DestroyAPIView):
     # Класс сериализатора
@@ -297,6 +304,7 @@ class ProfileImageDeleteView(generics.DestroyAPIView):
         return Response({"detail": "Изображение профиля успешно удалено."}, status=status.HTTP_200_OK)
 
 
+
 # Класс получения изображения профиля
 class ProfileImageRetrieveView(generics.RetrieveAPIView):
     # Класс сериализатора
@@ -311,6 +319,8 @@ class ProfileImageRetrieveView(generics.RetrieveAPIView):
         profile_image = get_object_or_404(ProfileImage, id=self.kwargs['pk'], profile=profile)
         # Возвращаем объект изображения профиля
         return profile_image
+
+
 
 # Класс получения списка изображений профиля
 class ProfileImageListView(generics.ListAPIView):
@@ -338,7 +348,6 @@ class ProfileCreateView(generics.CreateAPIView):
     # Разрешенные классы
     permission_classes = [IsAuthenticated]
 
-
     # Создание объекта сериализатора
     def create(self, request, *args, **kwargs):
 
@@ -349,6 +358,7 @@ class ProfileCreateView(generics.CreateAPIView):
 
         # Получаем сериализатор
         serializer = self.get_serializer(data=request.data)
+
         # Проверяем данные сериализатора
         serializer.is_valid(raise_exception=True)
 
@@ -373,6 +383,7 @@ class ProfileCreateView(generics.CreateAPIView):
 
         # Возвращаем ответ с данными, заголовками и статусом кода
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 
 # Класс обновления профиля
@@ -405,6 +416,7 @@ class ProfileUpdateView(generics.UpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+
 # Класс получения данных пользователя
 class ProfileRetrieveView(generics.RetrieveAPIView):
     # Класс сериализатора
@@ -417,6 +429,8 @@ class ProfileRetrieveView(generics.RetrieveAPIView):
         return get_profile(self.request)
 
 
+
+# Класс полной информации профиля
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile_full_info(request, profile_id):
@@ -438,6 +452,9 @@ def profile_full_info(request, profile_id):
 
     return Response(profile_data, status=status.HTTP_200_OK)
 
+
+
+# Класс полной информации текущего профиля
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def my_profile_full_info(request):
@@ -449,6 +466,8 @@ def my_profile_full_info(request):
     return Response(profile_data, status=status.HTTP_200_OK)
 
 
+
+# Класс поиска анкет
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def search_profiles(request):
@@ -501,6 +520,8 @@ def search_profiles(request):
 
 
 
+
+# Список анкет, которые лайкнули текущего профиля
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def received_likes_profiles(request):
@@ -524,6 +545,7 @@ def received_likes_profiles(request):
 
 
 
+# Класс удаления лайка
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_received_like(request, pk):
@@ -545,6 +567,7 @@ def delete_received_like(request, pk):
 
 
 
+# Класс создания лайка
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_like(request):
@@ -595,7 +618,7 @@ def create_like(request):
         # Создаем объект пользователя чата с новым чатом и желанным пользователем
         ChatUser.objects.create(user=searching_user, chat=new_chat, date_joined=datetime_now, invite_reason='Был приглашен в чат.')
         # Отправка ответа о том, что чат успешно создани, а также статус код 201
-        return Response({"detail": "Чат успешно создан."}, status=status.HTTP_201_CREATED)
+        return Response({"detail": "Чат успешно создан.", "chat": ChatSerializer(new_chat).data}, status=status.HTTP_201_CREATED)
 
     # Получение или создание объекта лайка, у которого отправитель данный профиль, а получатель желанный профиль
     new_like, new_like_created = Like.objects.get_or_create(receiver=searching_profile, sender=profile)

@@ -1,6 +1,8 @@
 from django.db import models
 from users.models import User
 
+from django.contrib.gis.db import models as gis_models
+
 from datetime import date
 
 # Create your models here.
@@ -30,13 +32,15 @@ class Profile(models.Model):
         FLIRT = 'FLIRT', 'Флирт и свидания'
         UNRESOLVED = 'UNRESOLVED', 'Решу потом'
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profiles')
     first_name = models.CharField(verbose_name='Имя пользователя', max_length=200, null=False, blank=False)
     gender = models.CharField(verbose_name='Пол', choices=Gender.choices, max_length=6, null=False, blank=False)
+    searching_gender = models.CharField(verbose_name='Кого ищет', choices=Gender.choices, max_length=6, null=False, blank=False)
     birthday = models.DateField(verbose_name='День рождения', null=False, blank=False)
     dating_purpose = models.CharField(verbose_name='Цель знакомства', choices=DatingPurpose.choices, max_length=12, null=False, blank=False)
+    position = gis_models.PointField(verbose_name="Позиция", null=False, blank=False)
+    location = models.CharField(verbose_name="Локация", null=False, blank=False)
     description = models.TextField(verbose_name='О себе', max_length=5000, null=True, blank=True)
-    searching_gender = models.CharField(verbose_name='Кого ищет', choices=Gender.choices, max_length=6, null=False, blank=False)
     smokes_cigarettes = models.BooleanField(verbose_name='Курит сигареты', null=True, blank=True)
     drinks_alcoholics = models.BooleanField(verbose_name='Пьёт алкоголь', null=True, blank=True)
     has_children = models.BooleanField(verbose_name='Есть дети', null=True, blank=True)

@@ -9,12 +9,12 @@ class ChatUser(models.Model):
     chat = models.ForeignKey('Chat', on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
     invite_reason = models.CharField(max_length=255)
-    last_seen = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'chat_users'
         verbose_name = 'Пользователь чата'
         verbose_name_plural = 'Пользователи чата'
+        unique_together = ('user', 'chat')
 
     def __str__(self):
         return f"{self.user.username} - {self.chat.id}"
@@ -48,5 +48,24 @@ class Message(models.Model):
         verbose_name_plural = 'Сообщения'
 
 
+
     def __str__(self):
-        return f"{self.sender.username} - {self.chat.id}"
+        return (f"отправитель: {self.sender.username}\n"
+                f"chat_id: {self.chat.id}\n"
+                f"message_id: {self.id}"
+                )
+
+
+
+class ChatEvent(models.Model):
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="chat_events")
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="message_events")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_events")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'chat_events'
+        verbose_name = 'Событие чата'
+        verbose_name_plural = 'События чата'
+        unique_together = ('chat', 'message', 'user')

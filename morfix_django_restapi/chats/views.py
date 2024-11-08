@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import Chat, Message, ChatUser
+from .models import Chat, Message, ChatEvent
 from .serializers import MessageSerializer
 
 from profiles.models import Profile, ProfileImage
@@ -28,11 +28,11 @@ def chats_list(request):
         # Получение экземпляра последнего сообщения пользователя
         last_message = messages.order_by('datetime').last()
         try:
-            current_chat_user = ChatUser.objects.get(chat=chat, user=current_user)
-            # Список непрочитанных сообщений пользователя
-            unseen_messages = messages.filter(datetime__gt=current_chat_user.last_seen)
+            unseen_messages = ChatEvent.objects.filter(user=current_user, chat=chat, is_read=False)
+            # количество непрочитанных сообщений
+            unseen_messages_count = len(unseen_messages)
         except:
-            unseen_messages = None
+            unseen_messages_count = None
 
         try:
             # Если отправитель последнего сообщения равен текущему пользователю
@@ -75,7 +75,7 @@ def chats_list(request):
             'last_message_first_name': last_message_first_name,  # Имя профиля последнего сообщения в чате
             'last_message_text': last_message.text if last_message else None,# Текст последнего сообщения
             'last_message_datetime': last_message.datetime if last_message else None, # Дата и время последнего сообщений
-            'unseen_messages_length': unseen_messages.count(), # Количество непрочитанных сообщений в чате
+            'unseen_messages_length': unseen_messages_count, # Количество непрочитанных сообщений в чате
         }
         # Добавление словаря в список
         chats_data.append(chat_data)
@@ -90,6 +90,12 @@ def chat_room(request, chat_id):
 
     chat = Chat.objects.get(id=chat_id)
 
+    unseen_messages = ChatEvent.objects.filter(user=request.user, chat=chat, is_read=False).order_by('-id')
+
+    if unseen_messages:
+        # Удаляем экземпляра событий чата данного пользователя данного чата
+        unseen_messages.delete()
+
     if request.user not in chat.users.all():
         return Response({"detail": "Пользователь не является членом данного чата."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -100,6 +106,7 @@ def chat_room(request, chat_id):
         messages_data,
         status=status.HTTP_200_OK
     )
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
