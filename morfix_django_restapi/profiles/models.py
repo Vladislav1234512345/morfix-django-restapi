@@ -1,3 +1,5 @@
+from random import randint
+
 from django.db import models
 from users.models import User
 
@@ -50,6 +52,7 @@ class Profile(models.Model):
     age = models.PositiveIntegerField(verbose_name='Возраст', null=True, blank=True)
     hobbies = models.ManyToManyField('Hobby', related_name='profiles', through='ProfileHobby')
     is_active = models.BooleanField(verbose_name="Профиль активен", default=True)
+
 
     def save(self, *args, **kwargs):
         # Вычисляем возраст на основе даты рождения

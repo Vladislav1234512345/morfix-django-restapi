@@ -2,6 +2,8 @@ import random
 
 from datetime import date
 
+from django.contrib.gis.db.models.functions import Distance
+from django.db.models.functions import Random
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
@@ -474,35 +476,24 @@ def search_profiles(request):
     # Объект профиля
     profile = get_profile(request)
 
-    # Количество профилей для поиска
-    profiles_count = int(request.GET.get("profiles_count", 20))
-
-    # Разрешенный размах в возрасте
-    allowed_age_difference = int(request.GET.get("allowed_age_difference", 5))
-
     # Минимальный возраст профиля для поиска
-    min_age = profile.age - allowed_age_difference
+    min_age = int(request.GET.get("min_age", 18))
 
     # Максимальный возраст профиля для поиска
-    max_age = profile.age + allowed_age_difference
+    max_age = int(request.GET.get("max_age", 99))
+
+    # Радиус поиска анкет
+    radius = int(request.GET.get("radius", 10))
 
     # Список объектов профилей для мэтча
-    searching_profiles = Profile.objects.filter(
+    searching_profiles = Profile.objects.annotate(distance=Distance('position', profile.position)).filter(
+        distance__lte=radius * 1000,
         is_active=True,
         dating_purpose=profile.dating_purpose,
         gender=profile.searching_gender,
         searching_gender=profile.gender,
         age__range=(min_age, max_age)
-    ).exclude(user=request.user).prefetch_related('images')
-
-    # Явно указываем тип list для searching_profiles
-    searching_profiles = list(searching_profiles)
-
-    # Перемешиваем профили
-    random.shuffle(searching_profiles)
-
-    # Ограничиваем количество найденных профилей
-    searching_profiles = searching_profiles[:profiles_count]
+    ).exclude(user=request.user).order_by(Random())[:30].prefetch_related('images')
 
     # Список данных подходящих профилей
     searching_profiles_data = []
