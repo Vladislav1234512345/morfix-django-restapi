@@ -36,18 +36,25 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 # ALLOWED_HOSTS = ['*']
 
 
-import os
-if os.name == 'nt':
-    # import platform
-    OSGEO4W = r"C:\OSGeo4W"
-    # if '64' in platform.architecture()[0]:
-    #     OSGEO4W += "64"
-    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
-    os.environ['OSGEO4W_ROOT'] = OSGEO4W
-    os.environ['GDAL_DATA'] = OSGEO4W +  r"\share\gdal"
-    os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
-    GDAL_LIBRARY_PATH = OSGEO4W + r'\bin\gdal309.dll'
-    os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+# if os.name == 'nt':
+#     # import platform
+#     OSGEO4W = r"C:\OSGeo4W"
+#     # if '64' in platform.architecture()[0]:
+#     #     OSGEO4W += "64"
+#     assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+#     os.environ['OSGEO4W_ROOT'] = OSGEO4W
+#     os.environ['GDAL_DATA'] = OSGEO4W +  r"\share\gdal"
+#     os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
+#     GDAL_LIBRARY_PATH = OSGEO4W + r'\bin\gdal309.dll'
+#     os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+# else:  # Если это не Windows (т.е. Linux)
+#     # Установите переменные окружения для GDAL и PROJ
+#     os.environ['GDAL_DATA'] = '/usr/share/gdal'
+#     os.environ['PROJ_LIB'] = '/usr/share/proj'
+#
+#     # Если у вас есть необходимость указать путь к GDAL библиотеке явно
+#     GDAL_LIBRARY_PATH = '/usr/lib/libgdal.so'  # Путь может отличаться
+#     os.environ['PATH'] = '/usr/bin:' + os.environ['PATH']
 
 
 # Application definition

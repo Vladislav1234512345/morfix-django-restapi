@@ -25,6 +25,7 @@ from chats.serializers import ChatSerializer
 
 
 
+
 # Класс создания списка хобби профиля
 class ProfileHobbyListCreateView(generics.ListCreateAPIView):
     # Класс сериализатора
@@ -155,66 +156,47 @@ def get_hobbies_list(request):
 
 
 
-# Класс создания списка изображений профиля
-class ProfileImageListCreateView(generics.ListCreateAPIView):
-    # Класс сериализатора
-    serializer_class = ProfileImageSerializer
-    # Разрешенные классы
-    permission_classes = [IsAuthenticated]
+#функция создания списка изображений профиля
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def profile_images_create(request):
+    profile = get_profile(request)
 
-    def create(self, request, *args, **kwargs):
-        # Проверяем, что пришел список объектов
-        if not isinstance(request.data, list):
-            return Response({"error": "Ожидается список изображений профиля."}, status=status.HTTP_400_BAD_REQUEST)
+    if len(request.data) == 0:
+        return Response({"error": "Список изображений не должен быть пустым."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if len(request.data) == 0:
-            return Response({"error": "Список изображений не должен быть пустым."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Создаем сериализатор с контекстом запроса
-        serializer = self.get_serializer(data=request.data, many=True)
-
-        serializer.is_valid(raise_exception=True)
-
-        # Сохраняем данные
-        self.perform_create(serializer)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-
-# Класс создания изображения профиля
-class ProfileImageCreateView(generics.CreateAPIView):
-    # Класс сериализатора
-    serializer_class = ProfileImageSerializer
-    # Разрешенные классы
-    permission_classes = [IsAuthenticated]
-
-    # Создание объекта сериализатора
-    def create(self, request, *args, **kwargs):
-        # Получение профиля
-        profile = get_profile(self.request)
-        # Получаем сериализатор
-        serializer = self.get_serializer(data=request.data)
-        # Проверяем данные сериализатора
-        serializer.is_valid(raise_exception=True)
-
-        # Создаем объект, в данном случае объект profile_image
-        self.perform_create(serializer)
-
-        # Если данный экземпляр изображения профиля являеться главным,
-        # тогда изменяем все другие экземпляры изображений профиля, которые были главными
-        if serializer.data["is_main_image"] == True:
+    profile_images_data = []
+    count = 0
+    while True:
+        count += 1
+        image = request.data.get(f"image_{count}", None)
+        is_main_image = request.data.get(f"is_main_image_{count}", None)
+        if image is not None and is_main_image is not None:
+            is_main_image = True if is_main_image == "true" else False
+            if is_main_image:
                 profile_images = ProfileImage.objects.filter(
                     profile=profile,
                     is_main_image=True
-                ).exclude(id=serializer.data["id"])
+                )
                 profile_images.update(is_main_image=False)
 
-        # Получаем заголовки при успешном выполнении
-        headers = self.get_success_headers(serializer.data)
+            profile_image = ProfileImage.objects.create(profile=profile, image=image, is_main_image=is_main_image)
+            profile_image.save()
+            profile_images_data.append(ProfileImageSerializer(profile_image).data)
+        elif image is None and is_main_image is None:
+            break
+        else:
+            if image is None:
+                return Response({"error": f"У изображения профиля под номером {count} отсутсвует параметр image_{count}"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"error": f"У изображения профиля под номером {count} отсутсвует параметр is_main_image_{count}"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Возвращаем ответ с данными, заголовками и статусом кода
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    if len(profile_images_data):
+        return Response(profile_images_data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(
+            {"error": f"Вы ввели неверные данные или не ввели их вовсе."},
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 

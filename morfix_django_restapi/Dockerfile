@@ -4,20 +4,28 @@ FROM python:3.11-alpine3.18
 # Устанавливаем postgresql-client через apk
 RUN apk update && apk add --no-cache postgresql-client
 
-## Установка зависимостей для PostgreSQL и других пакетов
-#RUN apk add --no-cache postgresql-dev gcc musl-dev libffi-dev
-
-# Устанавливаем зависимости для PostgreSQL и PostGIS
-RUN apk update && apk add --no-cache \
+# Устанавливаем зависимости для PostgreSQL и пакеты для работы с геоданными
+RUN apk update && apk add --no-cache --virtual .build-deps \
     postgresql-dev \
-    postgresql-client \
     gcc \
     musl-dev \
     libffi-dev \
-    geos \
+    gdal-dev \
+    geos-dev \
     proj-dev \
-    gdal \
-    gdal-dev
+    proj-util \
+    sfcgal-dev && \
+    apk add --no-cache \
+    geos \
+    proj \
+    gdal
+
+## Установка зависимостей для PostgreSQL и других пакетов
+#RUN apk add --no-cache postgresql-dev gcc musl-dev libffi-dev
+
+# Устанавливаем переменные окружения для GDAL и PROJ
+ENV GDAL_DATA=/usr/share/gdal
+ENV PROJ_LIB=/usr/share/proj
 
 # Рабочая директория
 WORKDIR /usr/src/app

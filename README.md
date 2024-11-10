@@ -557,9 +557,9 @@
        }
     }
    10. Создаем фото профиля (анкеты):
-   url = http://127.0.0.1:8000/api/profile/image/add/
+   url = http://127.0.0.1:8000/api/profile/images/add/
    method = POST
-   media type = application/json
+   media type = form-data
    content = {
        "headers": {
             "Authorization": "Bearer <jwt>"
@@ -570,8 +570,13 @@
        },
         "body": {
            # Отправляем через form-data, и даем тип полю image file, так как туда будем загружать изображение
-           "image": "",
-           "is_main_image": ""
+           ***Отправляем данные первого изображения профиля***
+           "image_<photo_index>": "", # photo_index начинается с одного
+           "is_main_image_<photo_index>": "" # photo_index начинается с одного
+           photo_index++;
+           ***Отправляем данные второго изображения профиля***
+           "image_<photo_index>": "", # photo_index начинается с одного
+           "is_main_image_<photo_index>": "" # photo_index начинается с одного
        },
     }
     response = {

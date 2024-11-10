@@ -14,8 +14,7 @@ urlpatterns = [
     path('image/<int:pk>/delete/', views.ProfileImageDeleteView.as_view(), name='image-delete'),
     path('image/<int:pk>/update/', views.ProfileImageUpdateView.as_view(), name='image-update'),
     path('image/<int:pk>/', views.ProfileImageRetrieveView.as_view(), name='image'),
-    path('images/add/', views.ProfileImageListCreateView.as_view(), name='images-add'),
-    path('image/add/', views.ProfileImageCreateView.as_view(), name='image-add'),
+    path('images/add/', views.profile_images_create, name='images-add'),
     path('images/', views.ProfileImageListView.as_view(), name='images'),
 
     # Пути до профилей

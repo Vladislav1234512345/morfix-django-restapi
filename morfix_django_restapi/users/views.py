@@ -137,8 +137,13 @@ class UserDeleteView(generics.DestroyAPIView):
         user = self.get_object()
         self.perform_destroy(user)
 
-        # Возвращаем успешный ответ после удаления пользователя
-        return Response({"detail": "Ваш аккаунт был успешно удален."}, status=status.HTTP_200_OK)
+        # Ответ после удаления пользователя
+        response = Response({"detail": "Ваш аккаунт был успешно удален."}, status=status.HTTP_200_OK)
+
+        # Удалить refresh токен из cookies
+        response.delete_cookie(settings.SIMPLE_JWT.get('AUTH_COOKIE_REFRESH_NAME', 'refresh_token'))
+
+        return response
 
 
 

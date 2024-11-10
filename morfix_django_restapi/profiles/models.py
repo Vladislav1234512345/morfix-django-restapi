@@ -8,7 +8,7 @@ from django.contrib.gis.db import models as gis_models
 
 from datetime import date
 
-from random import randint
+from morfix_django_restapi.settings import logger
 
 
 # Create your models here.
@@ -69,7 +69,14 @@ class Profile(models.Model):
             geolocator = Nominatim(user_agent="morfix_dating_app_geolocation")
             geolocator_location = geolocator.reverse((self.location.y, self.location.x), language='ru')  # Используем (широту, долготу)
             if geolocator_location:
-                self.address = geolocator_location.address
+                # Извлекаем адрес из raw данных
+                address_components = geolocator_location.raw.get('address', None)
+                if address_components is not None:
+                    country = address_components.get('country')
+                    state = address_components.get('state')
+                    place_of_residence = address_components.get('city') or address_components.get('town') or address_components.get(
+                        'village')
+                    self.address = f"{country}, {state}, {place_of_residence}"
 
 
         super().save(*args, **kwargs)
