@@ -1,11 +1,23 @@
 # Используем базовый образ Python
-FROM python:3.11-alpine
+FROM python:3.11-alpine3.18
 
 # Устанавливаем postgresql-client через apk
 RUN apk update && apk add --no-cache postgresql-client
 
-# Установка зависимостей для PostgreSQL и других пакетов
-RUN apk add --no-cache postgresql-dev gcc musl-dev libffi-dev
+## Установка зависимостей для PostgreSQL и других пакетов
+#RUN apk add --no-cache postgresql-dev gcc musl-dev libffi-dev
+
+# Устанавливаем зависимости для PostgreSQL и PostGIS
+RUN apk update && apk add --no-cache \
+    postgresql-dev \
+    postgresql-client \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    geos \
+    proj-dev \
+    gdal \
+    gdal-dev
 
 # Рабочая директория
 WORKDIR /usr/src/app

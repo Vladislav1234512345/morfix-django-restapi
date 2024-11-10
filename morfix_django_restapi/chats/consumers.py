@@ -29,9 +29,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             self.chat_id = self.scope["url_route"]["kwargs"]["chat_id"]
 
-            logger.info(f"current_user_id = {self.user.id}")
-
-            logger.info(f"current_chat_id = {self.chat_id}")
 
             try:
                 self.chat = await database_sync_to_async(Chat.objects.get)(id=self.chat_id)
@@ -40,7 +37,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             if self.chat:
                     if  await self.is_user_in_chat_users():
-                        logger.info("group_add")
 
                         self.room_group_name = f"chat_{self.chat_id}"
 
@@ -64,7 +60,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             if self.chat and await self.is_user_in_chat_users():
 
-                logger.info('group_discard')
 
                 # Leave room group
                 await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
@@ -76,28 +71,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Получение json от вебсокета клиента
     async def receive(self, text_data):
 
-        logger.info("inside receive method")
 
         if self.chat and await self.is_user_in_chat_users():
             content = json.loads(text_data)
 
-            logger.info("receive_json")
-
             # Получаем действие
             action = content.get("action", None)
-            logger.info(f"action = {action}")
             # Получаем данные
             data = content.get("data", None)
-            logger.info(f"data = {data}")
             # Если действие равно "отправить"
             if action == "send":
-                logger.info("inside send action")
                 # Получаем текст по ключу "text"
                 text = data.get("text", None)
-                logger.info(f"text = {text}")
                 # Получаем медиа по ключу "media"
                 media = data.get("media", None)
-                logger.info(f"media = {media}")
 
                 # создание экземпляра сообщения
                 message = await database_sync_to_async(Message.objects.create)(
@@ -109,8 +96,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 
                 message_data = MessageSerializer(message).data
-
-                logger.info(f"message: {message_data}")
 
                 # Отправить сообщение в группу комнаты
                 await self.channel_layer.group_send(
@@ -126,28 +111,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     },
                 )
             elif action == "edit":
-                logger.info("inside edit action")
                 # ID сообщения
                 message_id = data.get("message_id", None)
-                logger.info(f"message_id = {message_id}")
 
                 # Получаем текст по ключу "text"
                 text = data.get("text", None)
-                logger.info(f"text = {text}")
 
                 # Получаем медиа по ключу "media"
                 media = data.get("media", None)
-                logger.info(f"media = {media}")
 
 
                 # Редактирование экземпляра сообщения
                 message = await self.edit_message(message_id=message_id, text=text, media=media)
 
-                logger.info("message is edited")
 
                 message_data = MessageSerializer(message).data
-
-                logger.info(f"message = {message_data}")
 
                 # Отправить сообщение в группу комнаты
                 await self.channel_layer.group_send(
@@ -163,10 +141,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     },
                 )
             elif action == "delete":
-                logger.info("inside delete action")
                 # ID сообщения
                 message_id = data.get("message_id", None)
-                logger.info(f"message_id = {message_id}")
 
 
                 # Удаление экземпляра сообщения
@@ -195,16 +171,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     # Редактирование сообщения
     def edit_message(self, message_id, text, media):
-        logger.info("inside edit_message function")
         message = Message.objects.filter(id=message_id, sender=self.user).first()
-        logger.info("edit_message function")
         if message:
-            logger.info("if_message")
             message.text = text
             message.media = media
             message.datetime = timezone.now()
             message.save(update_fields=["text", "media", "datetime"])
-            logger.info("message is saved")
 
         return message
 
@@ -258,7 +230,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 
     async def send_error_and_close_connection(self, error: str):
-        logger.info(error)
 
         await self.accept()
 
@@ -297,7 +268,6 @@ class ChatListConsumer(AsyncWebsocketConsumer):
 
 
     async def send_error_and_close_connection(self, error: str):
-        logger.info(error)
 
         await self.accept()
 

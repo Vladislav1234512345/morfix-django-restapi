@@ -32,23 +32,6 @@ class ProfileHobbyListCreateView(generics.ListCreateAPIView):
     # Разрешенные классы
     permission_classes = [IsAuthenticated]
 
-    # def get_queryset(self):
-    #     # Получаем профиль текущего пользователя
-    #     profile = get_profile(self.request)
-    #     profile_hobbies = ProfileHobby.objects.filter(profile=profile)  # Получаем все ProfileHobby для данного пользователя
-    #
-    #     profile_hobbies_list = []
-    #
-    #     for profile_hobby in profile_hobbies:
-    #         profile_hobby_dict = {
-    #             "id": profile_hobby.id,
-    #             "name": profile_hobby.hobby.name,
-    #         }
-    #
-    #         profile_hobbies_list.append(profile_hobby_dict)
-    #
-    #     return profile_hobbies_list
-
     def create(self, request, *args, **kwargs):
         # Проверяем, что пришел список объектов
         if not isinstance(request.data, list):
@@ -486,14 +469,14 @@ def search_profiles(request):
     radius = int(request.GET.get("radius", 10))
 
     # Список объектов профилей для мэтча
-    searching_profiles = Profile.objects.annotate(distance=Distance('position', profile.position)).filter(
+    searching_profiles = Profile.objects.annotate(distance=Distance('location', profile.location)).filter(
         distance__lte=radius * 1000,
         is_active=True,
         dating_purpose=profile.dating_purpose,
         gender=profile.searching_gender,
         searching_gender=profile.gender,
         age__range=(min_age, max_age)
-    ).exclude(user=request.user).order_by(Random())[:30].prefetch_related('images')
+    ).exclude(user=request.user).order_by(Random())[:30]
 
     # Список данных подходящих профилей
     searching_profiles_data = []

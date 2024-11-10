@@ -247,6 +247,10 @@
            "birthday": "", # Дата в формате: YYYY-MM-DD
            "dating_purpose": "", # Выбор одного из следующих значений: "MALE" (Мужчина), "FEMALE" (Женщина)
            "searching_gender": "" # Выбор одного из следующих значений: "MALE" (Мужчина), "FEMALE" (Женщина)
+           "location": {
+                "latitude": 53.196860, # double 
+                "longitude": 50.158323 # double
+            }
        },
     }
     response = {
@@ -258,6 +262,7 @@
            "birthday": "",
            "dating_purpose": "",
            "searching_gender": "",
+           "location": "SRID=4326;POINT (50.136764 53.113152)",
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
@@ -265,6 +270,7 @@
            "zodiac_signs": "",
            "education": "",
            "job": "",
+           "address": "",
            "age": "",
            "is_active": true/false,
        }
@@ -294,6 +300,7 @@
            "birthday": "",
            "dating_purpose": "",
            "searching_gender": "",
+           "location": "SRID=4326;POINT (50.136764 53.113152)",
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
@@ -301,6 +308,7 @@
            "zodiac_signs": "",
            "education": "",
            "job": "",
+           "address": "",
            "age": "",
            "is_active": true/false,
        }
@@ -330,6 +338,7 @@
            "birthday": "",
            "dating_purpose": "",
            "searching_gender": "",
+           "location": "SRID=4326;POINT (50.136764 53.113152)",
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
@@ -337,6 +346,7 @@
            "zodiac_signs": "",
            "education": "",
            "job": "",
+           "address": "",
            "age": "",
            "is_active": true/false,
        }
@@ -366,6 +376,7 @@
            "birthday": "",
            "dating_purpose": "",
            "searching_gender": "",
+           "location": "SRID=4326;POINT (50.136764 53.113152)",
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
@@ -373,6 +384,7 @@
            "zodiac_signs": "",
            "education": "",
            "job": "",
+           "address": "",
            "age": "",
            "is_active": true/false,
            "username": "",
@@ -405,6 +417,7 @@
            "birthday": "",
            "dating_purpose": "",
            "searching_gender": "",
+           "location": "SRID=4326;POINT (50.136764 53.113152)",
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
@@ -412,6 +425,7 @@
            "zodiac_signs": "",
            "education": "",
            "job": "",
+           "address": "",
            "age": "",
            "is_active": true/false,
            "username": "",
@@ -420,9 +434,10 @@
        }
     }
    6. Данные подходящих профилей (анкет):
-   url = http://127.0.0.1:8000/api/profile/search-profiles/?profiles_count=<int>&allowed_age_difference=<int>
-   profiles_count - количество запрашиваемых профилей - int
-   allowed_age_difference - разрешенная разница в возрасте - int
+   http://127.0.0.1:8000/api/profile/search-profiles/?radius=<int>&min_age=<int>&max_age=<int>
+   raduis - радиус поиска анкет (int)
+   min_age - минимальный возраст искомых анкет (int)
+   max_age - максимальный возраст искомых анкет (int)
    method = GET
    media type = application/json
    content = {
@@ -446,6 +461,7 @@
            "birthday": "",
            "dating_purpose": "",
            "searching_gender": "",
+           "location": "SRID=4326;POINT (50.136764 53.113152)",
            "description": "",
            "smokes_cigarettes": "",
            "drinks_alcoholics": "",
@@ -453,8 +469,10 @@
            "zodiac_signs": "",
            "education": "",
            "job": "",
+           "address": "",
            "age": "",
            "is_active": true/false,
+           "username": """,
            "hobbies": [],
            "images": []
        }

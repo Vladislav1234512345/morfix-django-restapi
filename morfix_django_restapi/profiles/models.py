@@ -1,11 +1,15 @@
-from random import randint
+# from django.db import models
+from django.contrib.gis.db import models
+from geopy.geocoders import Nominatim
 
-from django.db import models
 from users.models import User
 
 from django.contrib.gis.db import models as gis_models
 
 from datetime import date
+
+from random import randint
+
 
 # Create your models here.
 
@@ -40,8 +44,7 @@ class Profile(models.Model):
     searching_gender = models.CharField(verbose_name='Кого ищет', choices=Gender.choices, max_length=6, null=False, blank=False)
     birthday = models.DateField(verbose_name='День рождения', null=False, blank=False)
     dating_purpose = models.CharField(verbose_name='Цель знакомства', choices=DatingPurpose.choices, max_length=12, null=False, blank=False)
-    position = gis_models.PointField(verbose_name="Позиция", null=False, blank=False)
-    location = models.CharField(verbose_name="Локация", null=False, blank=False)
+    location = gis_models.PointField(verbose_name="Позиция", null=False, blank=False)
     description = models.TextField(verbose_name='О себе', max_length=5000, null=True, blank=True)
     smokes_cigarettes = models.BooleanField(verbose_name='Курит сигареты', null=True, blank=True)
     drinks_alcoholics = models.BooleanField(verbose_name='Пьёт алкоголь', null=True, blank=True)
@@ -49,7 +52,8 @@ class Profile(models.Model):
     zodiac_signs = models.BooleanField(verbose_name='Знаки Зодиака', choices=ZodiacSigns.choices, max_length=11, null=True, blank=True)
     education = models.CharField(verbose_name='Обучение', max_length=200, null=True, blank=True)
     job = models.CharField(verbose_name='Работа', max_length=200, null=True, blank=True)
-    age = models.PositiveIntegerField(verbose_name='Возраст', null=True, blank=True)
+    address = models.CharField(verbose_name="Локация", null=True, blank=True) # Заполняется автоматически, исходя из поля position
+    age = models.PositiveIntegerField(verbose_name='Возраст', null=True, blank=True) # Заполняется автоматически, исходя из поля birthday
     hobbies = models.ManyToManyField('Hobby', related_name='profiles', through='ProfileHobby')
     is_active = models.BooleanField(verbose_name="Профиль активен", default=True)
 
@@ -59,6 +63,15 @@ class Profile(models.Model):
         today = date.today()
         self.age = today.year - self.birthday.year - (
                     (today.month, today.day) < (self.birthday.month, self.birthday.day))
+
+        # Получаем местоположение на основе координат
+        if self.location:
+            geolocator = Nominatim(user_agent="morfix_dating_app_geolocation")
+            geolocator_location = geolocator.reverse((self.location.y, self.location.x), language='ru')  # Используем (широту, долготу)
+            if geolocator_location:
+                self.address = geolocator_location.address
+
+
         super().save(*args, **kwargs)
 
 

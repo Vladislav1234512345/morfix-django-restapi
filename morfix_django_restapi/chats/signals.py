@@ -32,7 +32,6 @@ def on_message_created(sender, instance, created, **kwargs):
 
 
         if message_sender_profile:
-            logger.info(f"first_name = {message_sender_profile.first_name}")
             last_message_first_name = message_sender_profile.first_name
         else:
             last_message_first_name = None
@@ -41,11 +40,7 @@ def on_message_created(sender, instance, created, **kwargs):
         for user in chat.users.all():
             # Создание события только для пользователей, не находящихся в чате
             if not user_in_chat(chat_id=chat.id, user_id=user.id):  # Проверяем статус через флаг или иной механизм
-                logger.info(f"user with id - {user.id} not in chat with id - {chat.id}")
                 ChatEvent.objects.create(chat=chat, message=instance, user=user, is_read=False)
-
-            logger.info(f"user_id = {user.id}")
-            logger.info(f"instance_sender_id = {instance.sender.id}")
 
             # Отправка обновления списка чатов
             async_to_sync(channel_layer.group_send)(
@@ -64,7 +59,6 @@ def on_message_created(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=ChatEvent)
 def on_chat_event_deleted(sender, instance, **kwargs):
 
-    logger.info(f"delete chatevent with id - {instance.id}")
 
     if not instance.is_read:
 
@@ -72,20 +66,6 @@ def on_chat_event_deleted(sender, instance, **kwargs):
 
         chat = instance.chat
 
-        message = instance.message
-
-        # profile = user.profiles.first()
-
-        # logger.info(f"user_id = {user.id}")
-        # logger.info(f"message_sender_id = {message.sender.id}")
-
-        # if profile:
-        #     if user.id == message.sender.id:
-        #         last_message_first_name = "Вы"
-        #     else:
-        #         last_message_first_name = profile.first_name
-        # else:
-        #     last_message_first_name = None
 
         # Отправка обновления списка чатов
         async_to_sync(channel_layer.group_send)(

@@ -32,8 +32,22 @@ SECRET_KEY = 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l
 DEBUG = True
 
 # Разрешенные хосты
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# ALLOWED_HOSTS = ['*']
+
+
+import os
+if os.name == 'nt':
+    # import platform
+    OSGEO4W = r"C:\OSGeo4W"
+    # if '64' in platform.architecture()[0]:
+    #     OSGEO4W += "64"
+    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+    os.environ['OSGEO4W_ROOT'] = OSGEO4W
+    os.environ['GDAL_DATA'] = OSGEO4W +  r"\share\gdal"
+    os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
+    GDAL_LIBRARY_PATH = OSGEO4W + r'\bin\gdal309.dll'
+    os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
 
 
 # Application definition
@@ -46,11 +60,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
+    'django.contrib.gis', # приложение для работы с геоданными
 
     # Сторонние приложения
     'django_celery_beat',
     'channels',
     'corsheaders',
+    'leaflet', # Для отображения объектов на карте
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
@@ -60,6 +76,10 @@ INSTALLED_APPS = [
     'profiles',
     'chats',
 ]
+
+LEAFLET_CONFIG = {
+    'SLD': True,  # Если вы хотите использовать стиль карты
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -137,12 +157,13 @@ WSGI_APPLICATION = 'morfix_django_restapi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'morfix_django_restapi',
         'USER': 'postgres',
         'PASSWORD': 'root',
-        'HOST': 'localhost',
-        # 'HOST': 'db',
+        # 'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
@@ -198,8 +219,8 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            # "hosts": [("redis", 6379)],
-            "hosts": [("localhost", 6379)],
+            "hosts": [("redis", 6379)],
+            # "hosts": [("localhost", 6379)],
         },
     },
 }
@@ -247,25 +268,21 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'INFO',  # Устанавливаем уровень для сообщений
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',  # Уровень логирования для всего Django
-            'propagate': True,
-        },
-        '': {
-            'handlers': ['console'],
-            'level': 'INFO',  # Уровень логирования для всех остальных логеров
-            'propagate': True,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'level': 'INFO',  # Устанавливаем уровень для сообщений
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'INFO',  # Уровень логирования для всего Django
+#             'propagate': True,
+#         },
+#
+#     },
+# }

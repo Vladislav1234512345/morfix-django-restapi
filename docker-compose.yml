@@ -1,6 +1,6 @@
 services:
   web:
-    image: vladislav1234512345/morfix-django-restapi:1.2.8
+    image: vladislav1234512345/morfix-django-restapi:1.2.9
     command: >
       sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
@@ -22,7 +22,7 @@ services:
       - celery
 
   db:
-    image: postgres
+    image: postgis/postgis
     environment:
       POSTGRES_DB: morfix_django_restapi
       POSTGRES_USER: postgres
@@ -40,7 +40,7 @@ services:
       - redis_data:/data
 
   celery:
-    image: vladislav1234512345/morfix-django-restapi:1.2.8
+    image: vladislav1234512345/morfix-django-restapi:1.2.9
     command: >
       sh -c "celery -A morfix_django_restapi worker --loglevel=info --uid=nobody"
     environment:
@@ -57,7 +57,7 @@ services:
       - redis
 
   celery-beat:
-    image: vladislav1234512345/morfix-django-restapi:1.2.8
+    image: vladislav1234512345/morfix-django-restapi:1.2.9
     command: >
       sh -c "celery -A morfix_django_restapi beat --loglevel=info"
     environment:

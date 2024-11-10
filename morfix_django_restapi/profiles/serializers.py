@@ -1,8 +1,12 @@
+from django.contrib.gis.geos import Point
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import get_object_or_404
 
 from .models import Profile, ProfileImage, Hobby, ProfileHobby, Like
+
+
+from morfix_django_restapi.settings import logger
 
 # Сериализатора для хобби
 class HobbySerializer(serializers.ModelSerializer):
@@ -84,7 +88,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             'birthday',
             'dating_purpose',
             'searching_gender',
-            'position',
             'location',
             'description',
             'smokes_cigarettes',
@@ -93,6 +96,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'zodiac_signs',
             'education',
             'job',
+            'address',
             'age',
             'is_active',
         )
@@ -100,10 +104,20 @@ class ProfileSerializer(serializers.ModelSerializer):
     # Метод создания экземпляра сериализатора
     def create(self, validated_data):
 
+        location_data = validated_data.pop('location', None)  # 'location' is your PointField
+
+        if location_data and isinstance(location_data, dict):
+            # Convert dictionary to Point object
+            latitude = location_data.get('latitude')
+            longitude = location_data.get('longitude')
+            location = Point(longitude, latitude)  # Note: longitude comes before latitude
+        else:
+            location = None
+
         # Получение объекта пользователя из запроса в контексте
         user = self.context['request'].user
         # Создаение объекта профиля
-        profile = Profile.objects.create(user=user, **validated_data)
+        profile = Profile.objects.create(user=user, location=location, **validated_data)
 
         return profile
 
@@ -115,8 +129,17 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.birthday = validated_data.get('birthday', instance.birthday)
         instance.dating_purpose = validated_data.get('dating_purpose', instance.dating_purpose)
         instance.searching_gender = validated_data.get('searching_gender', instance.searching_gender)
-        instance.position = validated_data.get('position', instance.position)
-        instance.location = validated_data.get('location', instance.location)
+
+        location_data = validated_data.pop('location', None)  # 'location' is your PointField
+
+        if location_data and isinstance(location_data, dict):
+            # Convert dictionary to Point object
+            latitude = location_data.get('latitude')
+            longitude = location_data.get('longitude')
+            instance.location = Point(longitude, latitude)  # Note: longitude comes before latitude
+        else:
+            instance.location = instance.location
+
         instance.description = validated_data.get('description', instance.description)
         instance.smokes_cigarettes = validated_data.get('smokes_cigarettes', instance.smokes_cigarettes)
         instance.drinks_alcoholics = validated_data.get('drinks_alcoholics', instance.drinks_alcoholics)
@@ -124,6 +147,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.zodiac_signs = validated_data.get('zodiac_signs', instance.zodiac_signs)
         instance.education = validated_data.get('education', instance.education)
         instance.job = validated_data.get('job', instance.job)
+        instance.address = validated_data.get('address', instance.address)
         instance.age = validated_data.get('age', instance.age)
         instance.is_active = validated_data.get('is_active', instance.is_active)
 
