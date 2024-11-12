@@ -1,4 +1,9 @@
-venv/
-*.pyc
+# Папки
+*venv/
+*idea/
 __pycache__/
 media/
+
+# Файлы
+.env
+*.pyc

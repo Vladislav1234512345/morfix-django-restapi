@@ -69,7 +69,7 @@ def chats_list(request):
         # Словарь с данными чата
         chat_data = {
             'chat_id': chat.id, # ID чата
-            'other_profile_id': other_profile.id, # ID профиля собеседника
+            'other_profile_id': other_profile.id if other_profile is not None else None, # ID профиля собеседника
             'other_profile_image': other_profile_image,  # Изображение профиля собеседника чата
             'other_profile_first_name': other_profile_first_name,  # Имя профиля собеседника чата
             'last_message_first_name': last_message_first_name,  # Имя профиля последнего сообщения в чате
