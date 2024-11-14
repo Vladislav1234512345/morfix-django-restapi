@@ -9,9 +9,7 @@ from .models import Chat, Message
 
 from .serializers import MessageSerializer
 
-from .signals import redis_client
-
-from morfix_django_restapi.settings import logger
+from morfix_django_restapi.settings import redis_client
 
 import json
 
@@ -28,7 +26,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.user = self.scope["user"]
 
             self.chat_id = self.scope["url_route"]["kwargs"]["chat_id"]
-
 
             try:
                 self.chat = await database_sync_to_async(Chat.objects.get)(id=self.chat_id)

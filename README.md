@@ -930,16 +930,9 @@
        ]
     }
       5. Websocket чата:
-      url = ws://127.0.0.1:8000/ws/chat/<chat_id>/
+      url = ws://127.0.0.1:8000/ws/chat/<chat_id>/?token=<access_token>
       media type = application/json
       content = {
-          "headers": {
-               "Authorization": "Bearer <jwt>"
-          },
-          "cookies": {
-                  "refresh_token": ""
-              }
-          },
            "body": {
                     ***Отправка сообщения***
                     {
@@ -1003,16 +996,9 @@
           }
        }
    6. Websocket списка чатов:
-   url = ws://127.0.0.1:8000/ws/chats/
+   url = ws://127.0.0.1:8000/ws/chats/?token=<access_token>
    media type = application/json
    content = {
-       "headers": {
-            "Authorization": "Bearer <jwt>"
-       },
-       "cookies": {
-               "refresh_token": ""
-           }
-       },
         "body": {
        },
     }

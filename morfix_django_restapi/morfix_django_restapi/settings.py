@@ -16,6 +16,8 @@ from datetime import timedelta
 
 import logging
 
+import redis
+
 logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -32,8 +34,8 @@ SECRET_KEY = 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l
 DEBUG = True
 
 # Разрешенные хосты
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-# ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # if os.name == 'nt':
@@ -275,6 +277,7 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+
 # LOGGING = {
 #     'version': 1,
 #     'disable_existing_loggers': False,
@@ -290,6 +293,14 @@ CELERY_BEAT_SCHEDULE = {
 #             'level': 'INFO',  # Уровень логирования для всего Django
 #             'propagate': True,
 #         },
-#
+#         '': {
+#             'handlers': ['console'],
+#             'level': 'INFO',  # Уровень логирования для всех остальных логеров
+#             'propagate': True,
+#         },
 #     },
 # }
+
+# Настройки подключение редиса
+# redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+redis_client = redis.StrictRedis(host="redis", port=6379, db=0)

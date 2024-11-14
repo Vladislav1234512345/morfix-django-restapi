@@ -5,17 +5,13 @@ from django.db.models.signals import post_save, post_delete
 
 from .models import Message, ChatEvent
 
-from morfix_django_restapi.settings import logger
-
-
-import redis
-
 from channels.layers import get_channel_layer
+
+from morfix_django_restapi.settings import redis_client
 
 channel_layer = get_channel_layer()  # Получаем channel_layer один раз на уровне модуля
 
 # Настройка клиента Redis
-redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
 
 def user_in_chat(user_id, chat_id):
     # Проверяем наличие пользователя в Redis
