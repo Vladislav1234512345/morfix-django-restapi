@@ -17,7 +17,9 @@ def get_profile(request):
 def get_profile_full_info_data(profile):
     # Получение данных профиля
     profile_data = ProfileSerializer(profile).data
-    # Добавление ключ username и его значение
+    # Добавление ключа user_id и его значения
+    profile_data["user_id"] = profile.user.id
+    # Добавление ключа username и его значения
     profile_data["username"] = profile.user.username
 
     profile_hobbies = ProfileHobby.objects.filter(profile=profile).all()

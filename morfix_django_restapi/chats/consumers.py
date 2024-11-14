@@ -14,7 +14,6 @@ from morfix_django_restapi.settings import redis_client
 import json
 
 
-
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
 
@@ -259,6 +258,7 @@ class ChatListConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_discard(f"user_{self.user.id}", self.channel_name)
 
     async def send_event_update(self, event):
+
 
         # Отправляем обновление о непрочитанных сообщениях для каждого чата
         await self.send(text_data=json.dumps(event, ensure_ascii=False))

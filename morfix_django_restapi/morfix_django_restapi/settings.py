@@ -37,6 +37,35 @@ DEBUG = True
 # ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 ALLOWED_HOSTS = ['*']
 
+DATABASES = {
+    'default': {
+        # 'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'morfix_django_restapi',
+        'USER': 'postgres',
+        'PASSWORD': 'root',
+        # 'HOST': 'localhost',
+        'HOST': 'db',
+        'PORT': '5432',
+    }
+}
+
+# Настройки подключение редиса
+# redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+redis_client = redis.StrictRedis(host="redis", port=6379, db=0)
+
+# Расположение основного asgi приложения в проекте
+ASGI_APPLICATION = "morfix_django_restapi.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+            # "hosts": [("localhost", 6379)],
+        },
+    },
+}
+
 
 # if os.name == 'nt':
 #     # import platform
@@ -59,7 +88,7 @@ ALLOWED_HOSTS = ['*']
 #     os.environ['PATH'] = '/usr/bin:' + os.environ['PATH']
 
 
-# Application definition
+
 INSTALLED_APPS = [
     'daphne',
     'django.contrib.admin',
@@ -164,19 +193,6 @@ WSGI_APPLICATION = 'morfix_django_restapi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        # 'ENGINE': 'django.db.backends.postgresql',
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'morfix_django_restapi',
-        'USER': 'postgres',
-        'PASSWORD': 'root',
-        # 'HOST': 'localhost',
-        'HOST': 'db',
-        'PORT': '5432',
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -221,18 +237,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Расположение основного asgi приложения в проекте
-ASGI_APPLICATION = "morfix_django_restapi.asgi.application"
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("redis", 6379)],
-            # "hosts": [("localhost", 6379)],
-        },
-    },
-}
 
 # Модель авторизации пользователя
 AUTH_USER_MODEL = 'users.User'
@@ -301,6 +305,3 @@ CELERY_BEAT_SCHEDULE = {
 #     },
 # }
 
-# Настройки подключение редиса
-# redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
-redis_client = redis.StrictRedis(host="redis", port=6379, db=0)

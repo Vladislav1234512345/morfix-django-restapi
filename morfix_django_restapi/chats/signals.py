@@ -23,7 +23,6 @@ def on_message_created(sender, instance, created, **kwargs):
     if created:
         chat = instance.chat
 
-
         message_sender_profile = instance.sender.profiles.first()
 
 
@@ -37,6 +36,7 @@ def on_message_created(sender, instance, created, **kwargs):
             # Создание события только для пользователей, не находящихся в чате
             if not user_in_chat(chat_id=chat.id, user_id=user.id):  # Проверяем статус через флаг или иной механизм
                 ChatEvent.objects.create(chat=chat, message=instance, user=user, is_read=False)
+
 
             # Отправка обновления списка чатов
             async_to_sync(channel_layer.group_send)(
