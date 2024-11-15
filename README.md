@@ -387,6 +387,7 @@
            "address": "",
            "age": "",
            "is_active": true/false,
+           "user_id": "",
            "username": "",
            "hobbies": [],
            "images": []
@@ -428,6 +429,7 @@
            "address": "",
            "age": "",
            "is_active": true/false,
+           "user_id": "",
            "username": "",
            "hobbies": [],
            "images": []
@@ -472,7 +474,8 @@
            "address": "",
            "age": "",
            "is_active": true/false,
-           "username": """,
+           "user_id": "",
+           "username": "",
            "hobbies": [],
            "images": []
        }
@@ -821,6 +824,7 @@
                    "job": "",
                    "age": "",
                    "is_active": true/false,
+                   "user_id": "",
                    "username": "",
                    "hobbies": [],
                    "images": []
@@ -925,76 +929,77 @@
        "json": [
             {
                 "chat_id": 4,
-                "other_user_is_online": true
+                "other_user_is_online": true,
+                "other_user_last_activity": ""
             }
        ]
     }
-      5. Websocket чата:
-      url = ws://127.0.0.1:8000/ws/chat/<chat_id>/?token=<access_token>
-      media type = application/json
-      content = {
-           "body": {
-                    ***Отправка сообщения***
-                    {
-                           "action": "send",
-                           "data": {
-                               "text": "",
-                               "media": null
-                           }
-                    }
-                    ***Редактирование сообщения***
-                    {
-                           "action": "edit",
-                           "data": {
-                               "message_id": 0,
-                               "text": "",
-                               "media": null
-                           }
-                    }
-                    ***Удаление сообщения***
-                    {
-                           "action": "delete",
-                           "data": {
-                               "message_id": 0
-                           }
-                    }
-          },
-       }
-       response = {
-          "json": {
-                    ***Отправка сообщения***
-                    {
-                        "action": "edit",
-                        "message": {
-                            "id": 0,
-                            "chat_id": 0,
-                            "sender_id": 0,
-                            "datetime": "2024-11-08T12:14:38.649364Z",
+   5. Websocket чата:
+   url = ws://127.0.0.1:8000/ws/chat/<chat_id>/?token=<access_token>
+   media type = application/json
+   content = {
+        "body": {
+                 ***Отправка сообщения***
+                 {
+                        "action": "send",
+                        "data": {
                             "text": "",
                             "media": null
                         }
-                    }
-                    ***Редактирование сообщения***
-                    {
+                 }
+                 ***Редактирование сообщения***
+                 {
                         "action": "edit",
-                        "message": {
-                            "id": 0,
-                            "chat_id": 0,
-                            "sender_id": 0,
-                            "datetime": "2024-11-08T12:14:20.028332Z",
+                        "data": {
+                            "message_id": 0,
                             "text": "",
                             "media": null
                         }
-                    }
-                    ***Удаление сообщения***
-                    {
-                           {
-                                "action": "delete",
-                                "message_id": 19
-                            }
-                    }
-          }
+                 }
+                 ***Удаление сообщения***
+                 {
+                        "action": "delete",
+                        "data": {
+                            "message_id": 0
+                        }
+                 }
+       },
+    }
+    response = {
+       "json": {
+                 ***Отправка сообщения***
+                 {
+                     "action": "edit",
+                     "message": {
+                         "id": 0,
+                         "chat_id": 0,
+                         "sender_id": 0,
+                         "datetime": "2024-11-08T12:14:38.649364Z",
+                         "text": "",
+                         "media": null
+                     }
+                 }
+                 ***Редактирование сообщения***
+                 {
+                     "action": "edit",
+                     "message": {
+                         "id": 0,
+                         "chat_id": 0,
+                         "sender_id": 0,
+                         "datetime": "2024-11-08T12:14:20.028332Z",
+                         "text": "",
+                         "media": null
+                     }
+                 }
+                 ***Удаление сообщения***
+                 {
+                        {
+                             "action": "delete",
+                             "message_id": 19
+                         }
+                 }
        }
+    }
    6. Websocket списка чатов:
    url = ws://127.0.0.1:8000/ws/chats/?token=<access_token>
    media type = application/json

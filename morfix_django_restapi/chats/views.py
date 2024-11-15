@@ -137,14 +137,15 @@ def chats_users_activity(request):
     # Цикл чатов
     for chat in chats:
         try:
-            # Последняя активность другого пользователя чата
-            other_user_is_online = chat.users.exclude(id=current_user.id).first().is_online
+            # Пользователь-собеседник чата
+            other_user = chat.users.exclude(id=current_user.id).first()
         except:
-            other_user_is_online = None
+            other_user = None
         # Добавление словаря в список с данными активности пользователей чатов
         chats_users_activity_data.append({
             "chat_id": chat.id,
-            "other_user_is_online": other_user_is_online
+            "other_user_is_online": other_user.is_online if other_user is not None else None,
+            "other_user_last_activity": other_user.last_activity if other_user is not None else None,
         })
     # Возвращение ответа с данными активности пользователей чатов и статусом кода 200
     return Response(chats_users_activity_data, status=status.HTTP_200_OK)
