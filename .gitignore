@@ -5,5 +5,5 @@ __pycache__/
 media/
 
 # Файлы
-.env
+.env*
 *.pyc
