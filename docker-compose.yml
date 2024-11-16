@@ -16,8 +16,8 @@ services:
       - DB_PORT=${DB_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-    env_file:
-      - .env
+#    env_file:
+#      - .env
     depends_on:
       - db
       - redis
@@ -29,8 +29,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    env_file:
-      - ./.env.db
+#    env_file:
+#      - ./.env.db
     ports:
       - "5432:5432"
     volumes:
@@ -56,8 +56,8 @@ services:
       - DB_PORT=${DB_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-    env_file:
-      - .env
+#    env_file:
+#      - .env
     depends_on:
       - db
       - redis
@@ -75,8 +75,8 @@ services:
       - DB_PORT=${DB_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-    env_file:
-      - .env
+#    env_file:
+#      - .env
     depends_on:
       - db
       - redis

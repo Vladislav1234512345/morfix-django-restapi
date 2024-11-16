@@ -5,6 +5,7 @@ stages:
 
 # Переменные
 variables:
+  DEBUG: $DEBUG
   DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
   DB_NAME: $DB_NAME
   DB_USER: $DB_USER
@@ -16,6 +17,21 @@ variables:
   POSTGRES_DB: $POSTGRES_DB
   POSTGRES_USER: $POSTGRES_USER
   POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+
+
+# Используем Docker-in-Docker
+services:
+  - docker:19.03.12-dind
+
+before_script:
+    # Устанавливаем docker в контейнер Ruby
+  - apt-get update && apt-get install -y docker.io
+  # Устанавливаем docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  # Пытаемся запустить docker, хотя он уже должен быть доступен в сервисе
+  - docker --version
+  - docker-compose --version
 
 
 # Задача для ветки feature
