@@ -1,0 +1,53 @@
+stages:
+  - build
+  - test
+  - deploy
+
+# Переменные
+variables:
+  DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
+  DB_NAME: $DB_NAME
+  DB_USER: $DB_USER
+  DB_PASSWORD: $DB_PASSWORD
+  DB_HOST: $DB_HOST
+  DB_PORT: $DB_PORT
+  REDIS_HOST: $REDIS_HOST
+  REDIS_PORT: $REDIS_PORT
+  POSTGRES_DB: $POSTGRES_DB
+  POSTGRES_USER: $POSTGRES_USER
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+
+before_script:
+  - mkdir -p ~/.ssh
+  - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+  - chmod 600 ~/.ssh/id_rsa
+  - eval $(ssh-agent -s)
+  - ssh-add ~/.ssh/id_rsa
+  - ssh-keyscan -H 188.120.231.10 >> ~/.ssh/known_hosts
+
+# Задача для ветки feature
+build-feature:
+  stage: build
+  script:
+    - echo "Сборка приложения для ветки feature..."
+    - docker-compose -f docker-compose.yml up
+  only:
+    - feature
+
+# Задача для ветки dev
+build-dev:
+  stage: build
+  script:
+    - echo "Сборка приложения для ветки dev..."
+    - docker-compose -f docker-compose.yml up
+  only:
+    - dev
+
+# Задача для ветки main
+deploy-main:
+  stage: deploy
+  script:
+    - echo "Развертывание на продакшн сервере..."
+    - ssh root@188.120.231.10 "cd /home/user/dipluv/backend/ && git pull && docker-compose up"
+  only:
+    - main

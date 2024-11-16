@@ -1,21 +1,21 @@
 services:
   web:
-    image: vladislav1234512345/morfix-django-restapi:1.2.15
+    image: vladislav1234512345/morfix-django-restapi:1.3.0
     command: >
       sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
       - "8000:8000"
-#    environment:
-#      - DEBUG=1
-#      - DB_NAME=morfix_django_restapi
-#      - DB_USER=postgres
-#      - DB_PASSWORD=root
-#      - DB_HOST=db
-#      - DB_PORT=5432
-#      - REDIS_HOST=redis
-#      - REDIS_PORT=6379
+    environment:
+      - DEBUG=${DEBUG}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
     env_file:
       - .env
     depends_on:
@@ -25,10 +25,10 @@ services:
 
   db:
     image: postgis/postgis
-#    environment:
-#      POSTGRES_DB: morfix_django_restapi
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: root
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     env_file:
       - ./.env.db
     ports:
@@ -44,39 +44,39 @@ services:
       - redis_data:/data
 
   celery:
-    image: vladislav1234512345/morfix-django-restapi:1.2.15
+    image: vladislav1234512345/morfix-django-restapi:1.3.0
     command: >
       sh -c "celery -A morfix_django_restapi worker --loglevel=info --uid=nobody"
-#    environment:
-#      - DEBUG=1
-#      - DB_NAME=morfix_django_restapi
-#      - DB_USER=postgres
-#      - DB_PASSWORD=root
-#      - DB_HOST=db
-#      - DB_PORT=5432
-#      - REDIS_HOST=redis
-#      - REDIS_PORT=6379
+    environment:
+      - DEBUG=${DEBUG}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
     env_file:
-      - .env.celery
+      - .env
     depends_on:
       - db
       - redis
 
   celery-beat:
-    image: vladislav1234512345/morfix-django-restapi:1.2.15
+    image: vladislav1234512345/morfix-django-restapi:1.3.0
     command: >
       sh -c "celery -A morfix_django_restapi beat --loglevel=info"
-#    environment:
-#      - DEBUG=1
-#      - DB_NAME=morfix_django_restapi
-#      - DB_USER=postgres
-#      - DB_PASSWORD=root
-#      - DB_HOST=db
-#      - DB_PORT=5432
-#      - REDIS_HOST=redis
-#      - REDIS_PORT=6379
+    environment:
+      - DEBUG=${DEBUG}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
     env_file:
-      - .env.celery
+      - .env
     depends_on:
       - db
       - redis
