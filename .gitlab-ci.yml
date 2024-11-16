@@ -1,10 +1,11 @@
-stages:
-  - build
-  - test
-  - deploy
+image: docker:latest
 
-# Переменные
+services:
+  - docker:19.03.12-dind
+
 variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
   DEBUG: $DEBUG
   DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
   DB_NAME: $DB_NAME
@@ -18,46 +19,42 @@ variables:
   POSTGRES_USER: $POSTGRES_USER
   POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
-
-# Используем Docker-in-Docker
-services:
-  - docker:dind
-
 before_script:
   - apt-get update && apt-get install -y docker.io
-  # Проверка состояния Docker
-  - docker info || (echo "Docker not running. Starting Docker..." && dockerd &)
-  - docker info
-  - curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+  - curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   - chmod +x /usr/local/bin/docker-compose
-  - docker --version
   - docker-compose --version
+  # Запуск Docker Daemon и ожидание его готовности
+  - dockerd & sleep 10
 
+stages:
+  - build
+  - test
+  - deploy
 
-
-# Задача для ветки feature
+# Сборка приложения для ветки feature
 build-feature:
   stage: build
   script:
     - echo "Сборка приложения для ветки feature..."
-    - docker-compose -f docker-compose.yml up
+    - docker-compose -f docker-compose.yml up --build -d
   only:
     - feature
 
-# Задача для ветки dev
+# Сборка приложения для ветки dev
 build-dev:
   stage: build
   script:
     - echo "Сборка приложения для ветки dev..."
-    - docker-compose -f docker-compose.yml up
+    - docker-compose -f docker-compose.yml up --build -d
   only:
     - dev
 
-# Задача для ветки main
+# Развертывание на продакшн сервере
 deploy-main:
   stage: deploy
   script:
     - echo "Развертывание на продакшн сервере..."
-    - ssh root@188.120.231.10 "cd /home/user/dipluv/backend/ && git pull && docker-compose up"
+    - ssh root@188.120.231.10 "cd /home/user/dipluv/backend/ && git pull && docker-compose up --build -d"
   only:
     - main
