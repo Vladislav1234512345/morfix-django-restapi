@@ -30,7 +30,7 @@ build-feature:
   stage: build
   script:
     - echo "Сборка приложения для ветки feature..."
-    - docker-compose -f docker-compose.yml up
+    - docker-compose up
   only:
     - feature
 
@@ -39,7 +39,7 @@ build-dev:
   stage: build
   script:
     - echo "Сборка приложения для ветки dev..."
-    - docker-compose -f docker-compose.yml up
+    - docker-compose l up
   only:
     - dev
 
