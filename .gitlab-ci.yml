@@ -3,6 +3,12 @@ image: docker:20.10.7
 services:
   - docker:20.10.7-dind
 
+default:
+  tags:
+    - dipluv 
+    - backend 
+    - runner
+
 variables:
   DOCKER_DRIVER: overlay2
   DEBUG: $DEBUG
