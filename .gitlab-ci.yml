@@ -17,13 +17,6 @@ variables:
   POSTGRES_USER: $POSTGRES_USER
   POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
-before_script:
-  - mkdir -p ~/.ssh
-  - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-  - chmod 600 ~/.ssh/id_rsa
-  - eval $(ssh-agent -s)
-  - ssh-add ~/.ssh/id_rsa
-  - ssh-keyscan -H 188.120.231.10 >> ~/.ssh/known_hosts
 
 # Задача для ветки feature
 build-feature:
