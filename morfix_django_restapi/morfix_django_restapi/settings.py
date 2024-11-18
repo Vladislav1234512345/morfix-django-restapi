@@ -24,13 +24,15 @@ from dotenv import load_dotenv
 
 load_dotenv('.env')
 
+logger.info(f"BASE_DIR: {BASE_DIR}")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l')
 
-DEBUG = False
+DEBUG = True
 
 # Разрешенные хосты
 ALLOWED_HOSTS = ['*']
@@ -229,9 +231,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+logger.info(f"STATIC_ROOT: {STATIC_ROOT}")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+logger.info(f"MEDIA_ROOT: {MEDIA_ROOT}")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -282,26 +287,26 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'level': 'INFO',  # Устанавливаем уровень для сообщений
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'INFO',  # Уровень логирования для всего Django
-#             'propagate': True,
-#         },
-#         '': {
-#             'handlers': ['console'],
-#             'level': 'INFO',  # Уровень логирования для всех остальных логеров
-#             'propagate': True,
-#         },
-#     },
-# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',  # Устанавливаем уровень для сообщений
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Уровень логирования для всего Django
+            'propagate': True,
+        },
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Уровень логирования для всех остальных логеров
+            'propagate': True,
+        },
+    },
+}
 

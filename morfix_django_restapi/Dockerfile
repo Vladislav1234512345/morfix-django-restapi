@@ -31,7 +31,9 @@ ENV PROJ_LIB=/usr/share/proj
 WORKDIR /usr/src/app
 
 # Создание директорий для статических и медиафайлов
-RUN mkdir -p static media
+# Изменим пути на /home/app/web/static и /home/app/web/media
+RUN mkdir -p /home/app/web/static /home/app/web/media
+
 
 # Переменные окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1

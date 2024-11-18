@@ -12,6 +12,8 @@ from .models import User
 
 from django.conf import settings
 
+from morfix_django_restapi.settings import logger
+
 
 class UserRegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -153,18 +155,25 @@ class CustomTokenRefreshView(TokenRefreshView):
         # Извлечение refresh токена из куков
         refresh_token = request.COOKIES.get(settings.SIMPLE_JWT.get('AUTH_COOKIE_REFRESH_NAME', 'refresh_token'))
 
+        logger.info(f"refresh_token: {refresh_token}")
+
         if not refresh_token:
             return Response({'detail': 'Refresh token не найден.'}, status=status.HTTP_401_UNAUTHORIZED)
 
         # Передаем токен для проверки
         request.data['refresh'] = refresh_token
 
+        logger.info(f"request.data['refresh']: {request.data['refresh']}")
+
         # Вызываем стандартный метод TokenRefreshView (POST)
         response = super().post(request, *args, **kwargs)
 
+        logger.info(f"response: {response}")
         # Если запрос успешен, установим новый refresh токен в куки
         if response.status_code == status.HTTP_200_OK:
             new_refresh_token = response.data.get('refresh')
+
+            logger.info(f"new_refresh_token: {new_refresh_token}")
 
             if new_refresh_token:
                 cookie_max_age = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()
@@ -173,7 +182,7 @@ class CustomTokenRefreshView(TokenRefreshView):
                     value=new_refresh_token,
                     httponly=True,
                     max_age=int(cookie_max_age),
-                    samesite='Lax',
+                    samesite='None',
                     secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', False)
                 )
 
