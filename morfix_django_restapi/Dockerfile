@@ -51,5 +51,7 @@ COPY . .
 # Проверка наличия manage.py
 RUN ls -la /usr/src/app/
 
+RUN python3 manage.py collectstatic --noinput
+
 # Команда для запуска приложения
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -30,15 +30,14 @@ load_dotenv('.env')
 
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l')
 
-DEBUG = bool(os.environ.get("DEBUG", default=0))
+DEBUG = False
 
 # Разрешенные хосты
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']
 
-hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1").split(" ")
-
-ALLOWED_HOSTS = hosts
+# hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1").split(" ")
+#
+# ALLOWED_HOSTS = hosts
 
 
 DATABASES = {
@@ -62,8 +61,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis", 6379)],
-            # "hosts": [("localhost", 6379)],
+            "hosts": [(os.environ.get("REDIS_HOST", "redis"), os.environ.get("REDIS_POST", 6379))],
         },
     },
 }
@@ -132,16 +130,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# # Разрешить все источники
-# CORS_ALLOW_ALL_ORIGINS = True
+# Разрешить все источники
+CORS_ALLOW_ALL_ORIGINS = True
 
-# Разрешеннные источники
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",  # Фронтенд адрес для доверенных запросов с CSRF-токеном
-#     "http://127.0.0.1:5173",
-# ]
-
-CORS_ALLOWED_ORIGINS = ["http://" + host + ":5137" for host in hosts]
+# CORS_ALLOWED_ORIGINS = ["http://" + host + ":5137" for host in hosts]
 
 CORS_ALLOW_CREDENTIALS = True  # Разрешить передачу данных в куках
 
@@ -166,12 +158,16 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# CSRF_TRUSTED_ORIGINS = [
-#     "http://localhost:5173",  # Фронтенд адрес для доверенных запросов с CSRF-токеном
-#     "http://127.0.0.1:5173",
-# ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://dipluv.ru",
+    "http://dipluv.ru:8080",
+    "https://dipluv.ru",
 
-CSRF_TRUSTED_ORIGINS = ["http://" + host + ":5137" for host in hosts]
+    "http://188.120.231.10",
+    "http://188.120.231.10:8080",
+]
+
+# CSRF_TRUSTED_ORIGINS = ["http://" + host + ":5137" for host in hosts]
 
 ROOT_URLCONF = 'morfix_django_restapi.urls'
 
@@ -231,7 +227,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
