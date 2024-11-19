@@ -164,11 +164,12 @@ CORS_ALLOW_HEADERS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "http://dipluv.ru",
-    "http://dipluv.ru:8080",
     "https://dipluv.ru",
+    "http://api.dipluv.ru",
+    "https://api.dipluv.ru",
 
     "http://188.120.231.10",
-    "http://188.120.231.10:8080",
+    "http://188.120.231.10:8000",
 ]
 
 # CSRF_TRUSTED_ORIGINS = ["http://" + host + ":5137" for host in hosts]
@@ -270,13 +271,13 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_COOKIE_NAME': 'access_token',  # Название cookie для токена доступа
     'AUTH_COOKIE_REFRESH_NAME': 'refresh_token',  # Название cookie для refresh токена
-    'AUTH_COOKIE_SECURE': False,  # Защищенность куки
+    'AUTH_COOKIE_SECURE': True,  # Защищенность куки
 }
 
-# Перенаправляет все HTTP-запросы на HTTPS
-SECURE_SSL_REDIRECT = True
-# Указывает, что используется HTTPS
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# # Перенаправляет все HTTP-запросы на HTTPS
+# SECURE_SSL_REDIRECT = True
+# # Указывает, что используется HTTPS
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Настройки для Celery
