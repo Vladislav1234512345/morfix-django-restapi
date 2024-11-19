@@ -14,7 +14,7 @@ def update_inactive_users():
     now = timezone.now()
     # Возвращает время ожидания, если в параметре переданы seconds=15, то вернет: 00.00.15
     last_activity_threshold = timedelta(
-        seconds=settings.CELERY_BEAT_SCHEDULE.get('mark-inactive-every-minute').get('schedule', 10)
+        seconds=settings.CELERY_BEAT_SCHEDULE.get('mark-inactive-every-minute').get('schedule', 5)
     )
     # Получаем всех пользователей, которые станут неактивными
     inactive_users = User.objects.filter(

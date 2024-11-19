@@ -162,15 +162,12 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://dipluv.ru",
-    "https://dipluv.ru",
-    "http://api.dipluv.ru",
-    "https://api.dipluv.ru",
-
-    "http://188.120.231.10",
-    "http://188.120.231.10:8000",
-]
+CSRF_TRUSTED_ORIGINS = str(
+    os.environ.get(
+        "DJANGO_CORS_ALLOWED_ORIGINS",
+        "http://localhost:5137 http://localhost:8000 http://127.0.0.1:5137 http://127.0.0.1:8000"
+    )
+).split(" ")
 
 ROOT_URLCONF = 'morfix_django_restapi.urls'
 
@@ -267,7 +264,7 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_COOKIE_NAME': 'access_token',  # Название cookie для токена доступа
     'AUTH_COOKIE_REFRESH_NAME': 'refresh_token',  # Название cookie для refresh токена
-    'AUTH_COOKIE_SECURE': True,  # Защищенность куки
+    'AUTH_COOKIE_SECURE': bool(os.environ.get("AUTH_COOKIE_SECURE", False)),  # Защищенность куки
 }
 
 # # Перенаправляет все HTTP-запросы на HTTPS
@@ -289,7 +286,7 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BEAT_SCHEDULE = {
     'mark-inactive-every-minute': {
         'task': 'users.tasks.update_inactive_users',
-        'schedule': 10,  # Каждую четверь минуты
+        'schedule': float(os.environ.get('SCHEDULE', 10)),  # Каждые 10 сек
     },
 }
 
