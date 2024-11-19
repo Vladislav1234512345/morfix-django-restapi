@@ -42,8 +42,8 @@ class UserRegisterView(generics.CreateAPIView):
             value=str(refresh),
             httponly=True,
             max_age=int(cookie_max_age),
-            domain=None,
-            samesite='None',
+            # domain=None,
+            samesite='Lax',
             secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', False)  # Включай secure, если используешь HTTPS
         )
 
@@ -114,8 +114,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 value=refresh_token,
                 httponly=True,
                 max_age=int(cookie_max_age),
-                domain=None,
-                samesite='None',
+                # domain=None,
+                samesite='Lax',
                 secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', False)  # Включай secure, если используешь HTTPS
             )
 
@@ -177,8 +177,8 @@ class CustomTokenRefreshView(TokenRefreshView):
                     value=new_refresh_token,
                     httponly=True,
                     max_age=int(cookie_max_age),
-                    domain=None,
-                    samesite='None',
+                    # domain=None,
+                    samesite='Lax',
                     secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', False)
                 )
 

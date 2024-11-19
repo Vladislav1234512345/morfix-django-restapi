@@ -257,7 +257,7 @@ REST_FRAMEWORK = {
 }
 
 # Домен для передачи сессионных данных в куках
-# SESSION_COOKIE_DOMAIN = ".dipluv.ru"
+SESSION_COOKIE_DOMAIN = ".dipluv.ru"
 
 # Настройка простого jwt (Javascript web token)
 SIMPLE_JWT = {
