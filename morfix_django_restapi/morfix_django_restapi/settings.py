@@ -34,12 +34,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-_1*t3(z^!fpx9^u3w#s)u
 DEBUG = False
 
 # Разрешенные хосты
-ALLOWED_HOSTS = ['*']
-
-# hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1").split(" ")
-#
-# ALLOWED_HOSTS = hosts
-
+# ALLOWED_HOSTS = ['.dipluv.ru']
+ALLOWED_HOSTS = str(os.environ.get("DJANGO_ALLOWED_HOSTS", ".localhost 127.0.0.1 [::1]")).split(" ")
 
 DATABASES = {
     'default': {
