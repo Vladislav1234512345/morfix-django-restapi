@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 from dotenv import load_dotenv
 
-load_dotenv('.env')
+load_dotenv()
 
 logger.info(f"BASE_DIR: {BASE_DIR}")
 
@@ -52,6 +52,8 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
+
+logger.info(f"DATABASES: {DATABASES}")
 
 # Настройки подключение редиса
 # redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
@@ -257,6 +259,9 @@ REST_FRAMEWORK = {
     ),
 }
 
+# Домен для передачи сессионных данных в куках
+# SESSION_COOKIE_DOMAIN = ".dipluv.ru"
+
 # Настройка простого jwt (Javascript web token)
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
@@ -267,6 +272,11 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_REFRESH_NAME': 'refresh_token',  # Название cookie для refresh токена
     'AUTH_COOKIE_SECURE': False,  # Защищенность куки
 }
+
+# Перенаправляет все HTTP-запросы на HTTPS
+SECURE_SSL_REDIRECT = True
+# Указывает, что используется HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Настройки для Celery
@@ -309,4 +319,5 @@ LOGGING = {
         },
     },
 }
+
 
