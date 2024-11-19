@@ -24,7 +24,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-logger.info(f"BASE_DIR: {BASE_DIR}")
 
 
 # Quick-start development settings - unsuitable for production
@@ -32,7 +31,7 @@ logger.info(f"BASE_DIR: {BASE_DIR}")
 
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l')
 
-DEBUG = True
+DEBUG = False
 
 # Разрешенные хосты
 ALLOWED_HOSTS = ['*']
@@ -53,7 +52,6 @@ DATABASES = {
     }
 }
 
-logger.info(f"DATABASES: {DATABASES}")
 
 # Настройки подключение редиса
 # redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
@@ -234,11 +232,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-logger.info(f"STATIC_ROOT: {STATIC_ROOT}")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-logger.info(f"MEDIA_ROOT: {MEDIA_ROOT}")
 
 
 # Default primary key field type

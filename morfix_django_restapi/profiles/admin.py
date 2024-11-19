@@ -6,11 +6,15 @@ from . import models
 
 
 class ProfileImageAdmin(admin.ModelAdmin):
-    fields = ["profile", "image", "uploaded_at", "is_main_image"]
-    readonly_fields = ["image"]
+    fields = ["profile", "image", "preview", "is_main_image"]
+    readonly_fields = ["preview"]  # Добавляем превью изображения в readonly_fields
 
-    def image(self, obj):
-        return mark_safe(f'<img src="{obj.image.url}">')
+    def preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" />')
+        return "Нет изображения"
+
+    preview.short_description = "Обзор изображения"
 
 class ProfileAdmin(GISModelAdmin):
     list_display = ('id', 'first_name', 'address')  # отображение полей ('id', 'first_name', 'location')

@@ -9,15 +9,13 @@ from .models import Chat, Message
 
 from .serializers import MessageSerializer
 
-from morfix_django_restapi.settings import redis_client, logger
+from morfix_django_restapi.settings import redis_client
 
 import json
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-
-        logger.info("connect")
 
         if 'error' in self.scope:
             # Вызываем функцию, которая отправит сообщение об ошибке и закроет соединение

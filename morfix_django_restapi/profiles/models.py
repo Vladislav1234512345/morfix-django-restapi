@@ -8,7 +8,6 @@ from django.contrib.gis.db import models as gis_models
 
 from datetime import date
 
-from morfix_django_restapi.settings import logger
 
 
 # Create your models here.

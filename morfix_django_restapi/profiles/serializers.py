@@ -6,8 +6,6 @@ from rest_framework.generics import get_object_or_404
 from .models import Profile, ProfileImage, Hobby, ProfileHobby, Like
 
 
-from morfix_django_restapi.settings import logger
-
 # Сериализатора для хобби
 class HobbySerializer(serializers.ModelSerializer):
     class Meta:
