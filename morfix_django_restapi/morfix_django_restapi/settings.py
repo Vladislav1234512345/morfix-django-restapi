@@ -128,12 +128,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Разрешить все источники
-CORS_ALLOW_ALL_ORIGINS = True
+# # Разрешить все источники
+# CORS_ALLOW_ALL_ORIGINS = True
 
-# CORS_ALLOWED_ORIGINS = ["http://" + host + ":5137" for host in hosts]
+CORS_ALLOWED_ORIGINS = str(
+    os.environ.get(
+        "DJANGO_CORS_ALLOWED_ORIGINS",
+        "http://localhost:5137 http://localhost:8000 http://127.0.0.1:5137 http://127.0.0.1:8000"
+    )
+).split(" ")
 
-CORS_ALLOW_CREDENTIALS = True  # Разрешить передачу данных в куках
+# Разрешить передачу данных в куках
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
     'GET',
@@ -165,8 +171,6 @@ CSRF_TRUSTED_ORIGINS = [
     "http://188.120.231.10",
     "http://188.120.231.10:8000",
 ]
-
-# CSRF_TRUSTED_ORIGINS = ["http://" + host + ":5137" for host in hosts]
 
 ROOT_URLCONF = 'morfix_django_restapi.urls'
 
