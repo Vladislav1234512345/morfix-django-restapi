@@ -2,24 +2,23 @@ services:
   web:
     image: vladislav1234512345/morfix-django-restapi:${DJANGO_PROJECT_VERSION}
     command: >
-       sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-#       sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 morfix_django_restapi.asgi:application"
+      sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 morfix_django_restapi.asgi:application"
     volumes:
       - /usr/src/app/static:/usr/src/app/static
       - /usr/src/app/media:/usr/src/app/media
     ports:
       - "8000:8000"
-    environment:
-      - DEBUG=${DEBUG}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-#    env_file:
-#      - .env
+#    environment:
+#      - DEBUG=${DEBUG}
+#      - DB_NAME=${DB_NAME}
+#      - DB_USER=${DB_USER}
+#      - DB_PASSWORD=${DB_PASSWORD}
+#      - DB_HOST=${DB_HOST}
+#      - DB_PORT=${DB_PORT}
+#      - REDIS_HOST=${REDIS_HOST}
+#      - REDIS_PORT=${REDIS_PORT}
+    env_file:
+      - .env
     depends_on:
       - db
       - redis
@@ -27,12 +26,12 @@ services:
 
   db:
     image: postgis/postgis
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-#    env_file:
-#      - ./.env.db
+#    environment:
+#      POSTGRES_DB: ${DB_NAME}
+#      POSTGRES_USER: ${DB_USER}
+#      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - ./.env.db
     ports:
       - "5432:5432"
     volumes:
@@ -49,17 +48,17 @@ services:
     image: vladislav1234512345/morfix-django-restapi:${DJANGO_PROJECT_VERSION}
     command: >
       sh -c "celery -A morfix_django_restapi worker --loglevel=info --uid=nobody"
-    environment:
-      - DEBUG=${DEBUG}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-#    env_file:
-#      - .env
+#    environment:
+#      - DEBUG=${DEBUG}
+#      - DB_NAME=${DB_NAME}
+#      - DB_USER=${DB_USER}
+#      - DB_PASSWORD=${DB_PASSWORD}
+#      - DB_HOST=${DB_HOST}
+#      - DB_PORT=${DB_PORT}
+#      - REDIS_HOST=${REDIS_HOST}
+#      - REDIS_PORT=${REDIS_PORT}
+    env_file:
+      - .env
     depends_on:
       - db
       - redis
@@ -68,15 +67,15 @@ services:
     image: vladislav1234512345/morfix-django-restapi:${DJANGO_PROJECT_VERSION}
     command: >
       sh -c "celery -A morfix_django_restapi beat --loglevel=info"
-    environment:
-      - DEBUG=${DEBUG}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
+#    environment:
+#      - DEBUG=${DEBUG}
+#      - DB_NAME=${DB_NAME}
+#      - DB_USER=${DB_USER}
+#      - DB_PASSWORD=${DB_PASSWORD}
+#      - DB_HOST=${DB_HOST}
+#      - DB_PORT=${DB_PORT}
+#      - REDIS_HOST=${REDIS_HOST}
+#      - REDIS_PORT=${REDIS_PORT}
     env_file:
       - .env
     depends_on:
