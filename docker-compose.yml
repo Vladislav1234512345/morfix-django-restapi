@@ -1,8 +1,9 @@
 services:
   web:
-    image: vladislav1234512345/morfix-django-restapi:1.4.6
+    image: vladislav1234512345/morfix-django-restapi:${DJANGO_PROJECT_VERSION}
     command: >
-      sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 morfix_django_restapi.asgi:application"
+       sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+#       sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 morfix_django_restapi.asgi:application"
     volumes:
       - /usr/src/app/static:/usr/src/app/static
       - /usr/src/app/media:/usr/src/app/media
@@ -17,8 +18,8 @@ services:
       - DB_PORT=${DB_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-    env_file:
-      - .env
+#    env_file:
+#      - .env
     depends_on:
       - db
       - redis
@@ -30,8 +31,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    env_file:
-      - ./.env.db
+#    env_file:
+#      - ./.env.db
     ports:
       - "5432:5432"
     volumes:
@@ -45,7 +46,7 @@ services:
       - redis_data:/data
 
   celery:
-    image: vladislav1234512345/morfix-django-restapi:1.4.6
+    image: vladislav1234512345/morfix-django-restapi:${DJANGO_PROJECT_VERSION}
     command: >
       sh -c "celery -A morfix_django_restapi worker --loglevel=info --uid=nobody"
     environment:
@@ -57,14 +58,14 @@ services:
       - DB_PORT=${DB_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-    env_file:
-      - .env
+#    env_file:
+#      - .env
     depends_on:
       - db
       - redis
 
   celery-beat:
-    image: vladislav1234512345/morfix-django-restapi:1.4.6
+    image: vladislav1234512345/morfix-django-restapi:${DJANGO_PROJECT_VERSION}
     command: >
       sh -c "celery -A morfix_django_restapi beat --loglevel=info"
     environment:

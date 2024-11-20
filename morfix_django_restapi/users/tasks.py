@@ -1,27 +1,25 @@
-from django.utils import timezone
 from celery import shared_task
-from datetime import timedelta
+from asgiref.sync import async_to_sync
 
-from .models import User
+from channels.layers import get_channel_layer
 
-from django.conf import settings
+from morfix_django_restapi.settings import redis_client
+
+channel_layer = get_channel_layer()
 
 # Задача для всех приложений
 @shared_task
 # Функция обновелния неактивных пользователей
-def update_inactive_users():
-    # Дата и время сейчас
-    now = timezone.now()
-    # Возвращает время ожидания, если в параметре переданы seconds=15, то вернет: 00.00.15
-    last_activity_threshold = timedelta(
-        seconds=settings.CELERY_BEAT_SCHEDULE.get('mark-inactive-every-minute').get('schedule', 5)
-    )
-    # Получаем всех пользователей, которые станут неактивными
-    inactive_users = User.objects.filter(
-        # Поле is_active должно быть True
-        is_online=True,
-        # Последння активность пользователя < дата и время сейчас - время ожидания
-        last_activity__lt=now - last_activity_threshold
-    )
-    # Обновления неактивных пользователей: is_online поле становиться False
-    inactive_users.update(is_online=False)
+def for_active_users_update_other_users_activity():
+    active_users_encoded = redis_client.smembers('active_users')
+
+    active_users = {int(user.decode('utf-8')) for user in active_users_encoded}
+
+    for active_user in active_users:
+        # Отправка обновления списка чатов
+        async_to_sync(channel_layer.group_send)(
+            f"user_{active_user}",
+            {
+                "type": "send.active.users",
+            }
+        )

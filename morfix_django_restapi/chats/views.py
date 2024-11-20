@@ -124,30 +124,3 @@ def delete_chat(request, chat_id):
     return Response({"detail": "Чат успешно удален."}, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-# Контроллер активности пользователей чата
-def chats_users_activity(request):
-    # Текущий пользователь
-    current_user = request.user
-    # Чаты текущего пользователя
-    chats = current_user.chats.all()
-    # Данные активности пользователей чатов
-    chats_users_activity_data = []
-    # Цикл чатов
-    for chat in chats:
-        try:
-            # Пользователь-собеседник чата
-            other_user = chat.users.exclude(id=current_user.id).first()
-        except:
-            other_user = None
-        # Добавление словаря в список с данными активности пользователей чатов
-        chats_users_activity_data.append({
-            "chat_id": chat.id,
-            "other_user_is_online": other_user.is_online if other_user is not None else None,
-            "other_user_last_activity": other_user.last_activity if other_user is not None else None,
-        })
-    # Возвращение ответа с данными активности пользователей чатов и статусом кода 200
-    return Response(chats_users_activity_data, status=status.HTTP_200_OK)
-
-

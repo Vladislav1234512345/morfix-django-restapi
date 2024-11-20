@@ -56,8 +56,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             if self.chat and await self.is_user_in_chat_users():
 
-
-                # Leave room group
+                # Покинуть комнату группы
                 await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
                 # Убираем пользователя из списка активных
@@ -185,7 +184,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message.delete()
 
 
-
     # Получение сообщения от группы комнаты для его отправки
     async def chat_message_send(self, event):
         # Получение объекта message
@@ -246,7 +244,13 @@ class ChatListConsumer(AsyncWebsocketConsumer):
             self.user = self.scope['user']
 
             if self.user.is_authenticated:
+                # Обновление активности пользователя при подключении
+                await self.update_user(is_online=True)
+
                 await self.channel_layer.group_add(f"user_{self.user.id}", self.channel_name)
+
+                redis_client.sadd('active_users', str(self.user.id))
+
                 await self.accept()
             else:
                 await self.send_error_and_close_connection(error="Пользователь не может посмотреть чаты, пока не авторизуется.")
@@ -255,12 +259,24 @@ class ChatListConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         if not 'error' in self.scope:
             if self.user.is_authenticated:
+                # Обновление активности пользователя при отключении
+                await self.update_user(is_online=False)
+
                 await self.channel_layer.group_discard(f"user_{self.user.id}", self.channel_name)
+
+                redis_client.srem('active_users', str(self.user.id))
+
 
     async def send_event_update(self, event):
 
-
         # Отправляем обновление о непрочитанных сообщениях для каждого чата
+        await self.send(text_data=json.dumps(event, ensure_ascii=False))
+
+
+    async def send_active_users(self, event):
+        event["chats_users_activity"] = await self.get_chats_users_activity()
+
+        # Отправляем обновление о статусе активности каждого пользователя собеседника
         await self.send(text_data=json.dumps(event, ensure_ascii=False))
 
 
@@ -271,3 +287,37 @@ class ChatListConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"error": error}, ensure_ascii=False))
 
         await self.close()
+
+
+    @database_sync_to_async
+    # Получение активности пользователей чатов
+    def get_chats_users_activity(self):
+        chats = self.user.chats.all()
+        # Данные активности пользователей чатов
+        chats_users_activity_data = []
+        # Цикл чатов
+        for chat in chats:
+            try:
+                # Пользователь-собеседник чата
+                other_user = chat.users.exclude(id=self.user.id).first()
+            except:
+                other_user = None
+            # Добавление словаря в список с данными активности пользователей чатов
+            chats_users_activity_data.append({
+                "chat_id": chat.id,
+                "other_user_is_online": other_user.is_online if other_user is not None else None,
+                "other_user_last_activity": other_user.last_activity.isoformat() if other_user is not None else None,
+            })
+
+        return chats_users_activity_data
+
+
+    @database_sync_to_async
+    # Редактирование активности пользователя
+    def update_user(self, is_online: bool):
+        # Последняя актинвость = сейчас()
+        self.user.last_activity = timezone.now()
+        # Активность пользователя = Верно
+        self.user.is_online = is_online
+        # Сохраняем изменение только нескольких полей
+        self.user.save(update_fields=['last_activity', 'is_online'])

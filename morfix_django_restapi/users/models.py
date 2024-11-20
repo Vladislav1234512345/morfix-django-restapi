@@ -9,7 +9,7 @@ class User(AbstractUser):
     last_name = None
 
     last_activity = models.DateTimeField(verbose_name="Последняя активность", auto_now=True)
-    is_online = models.BooleanField(verbose_name="Пользователь онлайн", default=True)
+    is_online = models.BooleanField(verbose_name="Пользователь онлайн", default=False)
 
     class Meta:
         db_table = 'users'

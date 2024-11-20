@@ -18,6 +18,7 @@ def user_in_chat(user_id, chat_id):
     return redis_client.sismember(f"chat_{chat_id}_active_users", str(user_id))
 
 
+
 @receiver(post_save, sender=Message)
 def on_message_created(sender, instance, created, **kwargs):
     if created:

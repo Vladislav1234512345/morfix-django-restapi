@@ -969,7 +969,7 @@
        "json": {
                  ***Отправка сообщения***
                  {
-                     "action": "edit",
+                     "action": "send",
                      "message": {
                          "id": 0,
                          "chat_id": 0,
@@ -1024,5 +1024,18 @@
      "chat_id": 0,
      "unseen_messages_length": 0 
    }
+
+**Полученя активности пользователей-собеседников чатов**
+
+   {
+    "type": "send.active.users",
+    "chats_users_activity": [
+        {
+            "chat_id": 1,
+            "other_user_is_online": true,
+            "other_user_last_activity": "2024-11-20T19:12:16.937787+00:00"
+        }
+    ]
+}
        }
     }

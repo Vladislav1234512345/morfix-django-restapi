@@ -199,22 +199,3 @@ class UserLogoutView(APIView):
         response.delete_cookie(settings.SIMPLE_JWT.get('AUTH_COOKIE_REFRESH_NAME', 'refresh_token'))
         # Вернуть ответ
         return response
-
-
-class UserHeartBeatView(APIView):
-    # Для удаления refresh токена пользователя необходимо, чтобы он был аутентифицирован
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        # Дата и время сейчас
-        now = timezone.now()
-        # Текущий пользователь из запроса
-        user = request.user
-        # Последняя активность пользователя = сейчас
-        user.last_activity = now
-        # Активность пользователя = да
-        user.is_online = True
-        # Сохраняем изменение только нескольких полей
-        user.save(update_fields=['last_activity', 'is_online'])
-        # Возвращение ответа
-        return Response({"detail": "Активность текущего пользователя успешно обновлена."}, status=status.HTTP_200_OK)

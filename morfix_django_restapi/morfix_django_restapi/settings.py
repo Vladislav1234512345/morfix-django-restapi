@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
 
 
@@ -31,11 +31,11 @@ load_dotenv()
 
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l')
 
-DEBUG = False
+DEBUG = bool(os.environ.get("DEBUG", False))
 
 # Разрешенные хосты
-# ALLOWED_HOSTS = ['.dipluv.ru']
-ALLOWED_HOSTS = str(os.environ.get("DJANGO_ALLOWED_HOSTS", ".localhost 127.0.0.1 [::1]")).split(" ")
+ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = str(os.environ.get("DJANGO_ALLOWED_HOSTS", ".localhost 127.0.0.1 [::1]")).split(" ")
 
 DATABASES = {
     'default': {
@@ -284,9 +284,9 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 CELERY_BEAT_SCHEDULE = {
-    'mark-inactive-every-minute': {
-        'task': 'users.tasks.update_inactive_users',
-        'schedule': float(os.environ.get('SCHEDULE', 10)),  # Каждые 10 сек
+    'mark-activity-every-certain-time': {
+        'task': 'users.tasks.for_active_users_update_other_users_activity',
+        'schedule': float(os.environ.get('SCHEDULE', 5)),  # Каждые 10 сек
     },
 }
 
