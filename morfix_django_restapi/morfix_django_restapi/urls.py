@@ -20,6 +20,14 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path, include
 
+# Изменяем заголовки админ-панели django
+
+# Заголовок страницы входа
+admin.site.site_header = "Админ-панель DipLove"
+# Заголовок страницы в браузере
+admin.site.site_title = "Админ-панель DipLove"
+# Заголовок на главной странице панели
+admin.site.index_title = "Добро пожаловать в панель управления DipLove"
 
 urlpatterns = [
     path('api/user/', include('users.urls')),
