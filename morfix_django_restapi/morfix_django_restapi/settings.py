@@ -22,48 +22,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 from dotenv import load_dotenv
 
-load_dotenv()
-
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+
+# load_dotenv()
+
 
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l')
 
 DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 
 # Разрешенные хосты
-# ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = str(os.environ.get("DJANGO_ALLOWED_HOSTS", ".localhost 127.0.0.1 [::1]")).split(" ")
-
-DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get('DB_ENGINE', 'django.contrib.gis.db.backends.postgis'),
-        'NAME': os.environ.get('DB_NAME', 'morfix_django_restapi'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'root'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-    }
-}
-
-
-# Настройки подключение редиса
-# redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
-redis_client = redis.StrictRedis(host="redis", port=6379, db=0)
-
-# Расположение основного asgi приложения в проекте
-ASGI_APPLICATION = "morfix_django_restapi.asgi.application"
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(os.environ.get("REDIS_HOST", "redis"), os.environ.get("REDIS_POST", 6379))],
-        },
-    },
-}
-
+ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = str(os.environ.get("DJANGO_ALLOWED_HOSTS", ".localhost 127.0.0.1 [::1]")).split(" ")
 
 # if os.name == 'nt':
 #     # import platform
@@ -84,6 +55,33 @@ CHANNEL_LAYERS = {
 #     # Если у вас есть необходимость указать путь к GDAL библиотеке явно
 #     GDAL_LIBRARY_PATH = '/usr/lib/libgdal.so'  # Путь может отличаться
 #     os.environ['PATH'] = '/usr/bin:' + os.environ['PATH']
+
+DATABASES = {
+    'default': {
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.contrib.gis.db.backends.postgis'),
+        'NAME': os.environ.get('DB_NAME', 'morfix_django_restapi'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'root'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+    }
+}
+
+
+# Настройки подключение редиса
+# redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+redis_client = redis.StrictRedis(host=str(os.environ.get("REDIS_HOST", "localhost")), port=int(os.environ.get("REDIS_PORT", 6379)), db=0)
+
+# Расположение основного asgi приложения в проекте
+ASGI_APPLICATION = "morfix_django_restapi.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(os.environ.get("REDIS_HOST", "localhost"), os.environ.get("REDIS_POST", 6379))],
+        },
+    },
+}
 
 
 
@@ -134,7 +132,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = str(
     os.environ.get(
         "DJANGO_CORS_ALLOWED_ORIGINS",
-        "http://localhost:5137 http://localhost:8000 http://127.0.0.1:5137 http://127.0.0.1:8000"
+        "http://localhost:5173 http://localhost:8000 http://127.0.0.1:5173 http://127.0.0.1:8000"
     )
 ).split(" ")
 
@@ -165,7 +163,7 @@ CORS_ALLOW_HEADERS = [
 CSRF_TRUSTED_ORIGINS = str(
     os.environ.get(
         "DJANGO_CORS_ALLOWED_ORIGINS",
-        "http://localhost:5137 http://localhost:8000 http://127.0.0.1:5137 http://127.0.0.1:8000"
+        "http://localhost:5173 http://localhost:8000 http://127.0.0.1:5173 http://127.0.0.1:8000"
     )
 ).split(" ")
 
@@ -274,12 +272,10 @@ SIMPLE_JWT = {
 
 
 # Настройки для Celery
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_BROKER_URL = f'redis://{os.environ.get("REDIS_HOST", "localhost")}:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = f'redis://{os.environ.get("REDIS_HOST", "localhost")}:6379/0'
 CELERY_TIMEZONE = 'UTC'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 

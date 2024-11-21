@@ -38,7 +38,7 @@ class Profile(models.Model):
         UNRESOLVED = 'UNRESOLVED', 'Решу потом'
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profiles')
-    first_name = models.CharField(verbose_name='Имя пользователя', max_length=200, null=False, blank=False)
+    first_name = models.CharField(verbose_name='Имя пользователя', max_length=50, null=False, blank=False)
     gender = models.CharField(verbose_name='Пол', choices=Gender.choices, max_length=6, null=False, blank=False)
     searching_gender = models.CharField(verbose_name='Кого ищет', choices=Gender.choices, max_length=6, null=False, blank=False)
     birthday = models.DateField(verbose_name='День рождения', null=False, blank=False)

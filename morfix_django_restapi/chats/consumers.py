@@ -5,7 +5,7 @@ from channels.db import database_sync_to_async
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from .models import Chat, Message
+from .models import Chat, Message, ChatEvent
 
 from .serializers import MessageSerializer
 
@@ -247,11 +247,28 @@ class ChatListConsumer(AsyncWebsocketConsumer):
                 # Обновление активности пользователя при подключении
                 await self.update_user(is_online=True)
 
-                await self.channel_layer.group_add(f"user_{self.user.id}", self.channel_name)
+                self.group_name = f"user_{self.user.id}"
+
+                await self.channel_layer.group_add(self.group_name, self.channel_name)
 
                 redis_client.sadd('active_users', str(self.user.id))
 
                 await self.accept()
+
+                unseen_chats_count = await self.count_unseen_chats()
+
+                await self.channel_layer.group_send(
+                    self.group_name,
+                    {
+                        # По ключу type прописываем в значение название метода данного потребителя (consumer),
+                        # это вызовет данный метод, но если метод называется chat_message_send,
+                        # в значение нужно написать: chat.message.send,
+                        # т. е. вместо "_" используем "."
+                        "type": "send.unseen.chats",
+                        # Количество нерпочитанных чатов пользователя
+                        "unseen_chats_count": int(unseen_chats_count),
+                    },
+                )
             else:
                 await self.send_error_and_close_connection(error="Пользователь не может посмотреть чаты, пока не авторизуется.")
 
@@ -262,21 +279,25 @@ class ChatListConsumer(AsyncWebsocketConsumer):
                 # Обновление активности пользователя при отключении
                 await self.update_user(is_online=False)
 
-                await self.channel_layer.group_discard(f"user_{self.user.id}", self.channel_name)
+                await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
                 redis_client.srem('active_users', str(self.user.id))
 
-
+    # Асинхронная функция для отправки обновления о непрочитанных сообщениях для каждого чата
     async def send_event_update(self, event):
-
         # Отправляем обновление о непрочитанных сообщениях для каждого чата
         await self.send(text_data=json.dumps(event, ensure_ascii=False))
 
-
+    # Асинхронная функция для отправки обновления активности каждого пользователя собеседника
     async def send_active_users(self, event):
         event["chats_users_activity"] = await self.get_chats_users_activity()
 
-        # Отправляем обновление о статусе активности каждого пользователя собеседника
+        # Отправляем обновление активности каждого пользователя собеседника
+        await self.send(text_data=json.dumps(event, ensure_ascii=False))
+
+    # Асинхронная функция для отправки количества непрочитанных чатов пользователем
+    async def send_unseen_chats(self, event):
+        # Отправляем количество непрочитанных чатов пользователем
         await self.send(text_data=json.dumps(event, ensure_ascii=False))
 
 
@@ -321,3 +342,13 @@ class ChatListConsumer(AsyncWebsocketConsumer):
         self.user.is_online = is_online
         # Сохраняем изменение только нескольких полей
         self.user.save(update_fields=['last_activity', 'is_online'])
+
+
+    @database_sync_to_async
+    # Функция подсчёта непрочитанных чатов
+    def count_unseen_chats(self):
+        # Получаем все непрочитанные сообщения всех чатов по user, а также чтобы они были непрочитаны
+        chat_events = ChatEvent.objects.filter(user=self.user, is_read=False)
+        # Создаем список из всех id чатов каждого chat_event, а затем при помощи set оставляем только уникальные
+        # Возвращаем количество уникальных id чатов, что и будет равно количеству непрочитанных чатов пользователем
+        return len(set([chat_event.chat.id for chat_event in chat_events]))

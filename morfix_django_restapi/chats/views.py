@@ -11,6 +11,16 @@ from profiles.models import Profile, ProfileImage
 
 from profiles.serializers import ProfileImageSerializer
 
+from .functions import count_unseen_chats
+
+
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+channel_layer = get_channel_layer()  # Получаем channel_layer один раз на уровне модуля
+
+
+
 # Представление списка чатов
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -88,9 +98,11 @@ def chats_list(request):
 @permission_classes([IsAuthenticated])
 def chat_room(request, chat_id):
 
+    user = request.user
+
     chat = Chat.objects.get(id=chat_id)
 
-    unseen_messages = ChatEvent.objects.filter(user=request.user, chat=chat, is_read=False).order_by('-id')
+    unseen_messages = ChatEvent.objects.filter(user=user, chat=chat, is_read=False)
 
     if unseen_messages:
         # Удаляем экземпляра событий чата данного пользователя данного чата
@@ -101,6 +113,31 @@ def chat_room(request, chat_id):
 
     messages = chat.messages.all()
     messages_data = MessageSerializer(messages, many=True).data
+
+    # Отправка обновления списка чатов
+    async_to_sync(channel_layer.group_send)(
+        f"user_{user.id}",
+        {
+            "type": "send.event.update",
+            "chat_id": chat.id,
+            # 'last_message_first_name': last_message_first_name,  # Имя профиля последнего сообщения в чате
+            # 'last_message_text': message.text,  # Текст последнего сообщения
+            # 'last_message_datetime': message.datetime.isoformat(),  # Дата и время последнего сообщений
+            'unseen_messages_length': 0,
+            # Количество непрочитанных сообщений в чате
+        }
+    )
+
+    unseen_chats_count = count_unseen_chats(user=user)
+    # Отправка количество непрочитанных чатов пользователя
+    async_to_sync(channel_layer.group_send)(
+        f"user_{user.id}",
+        {
+            "type": "send.unseen.chats",
+            # Количество нерпочитанных чатов пользователя
+            "unseen_chats": int(unseen_chats_count),
+        }
+    )
 
     return Response(
         messages_data,
