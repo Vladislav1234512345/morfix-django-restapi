@@ -25,7 +25,7 @@ from dotenv import load_dotenv
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# load_dotenv()
+load_dotenv()
 
 
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l')
@@ -33,8 +33,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-_1*t3(z^!fpx9^u3w#s)u
 DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 
 # Разрешенные хосты
-ALLOWED_HOSTS = ['*']
-# ALLOWED_HOSTS = str(os.environ.get("DJANGO_ALLOWED_HOSTS", ".localhost 127.0.0.1 [::1]")).split(" ")
+# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = str(os.environ.get("DJANGO_ALLOWED_HOSTS", ".localhost 127.0.0.1 [::1]")).split(" ")
 
 # if os.name == 'nt':
 #     # import platform
