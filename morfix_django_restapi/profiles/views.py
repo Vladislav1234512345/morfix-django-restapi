@@ -25,7 +25,6 @@ from chats.serializers import ChatSerializer
 
 
 
-
 # Класс создания списка хобби профиля
 class ProfileHobbyListCreateView(generics.ListCreateAPIView):
     # Класс сериализатора
@@ -64,6 +63,7 @@ class ProfileHobbyListCreateView(generics.ListCreateAPIView):
         serializer.save(profile=profile)
 
 
+
 # Класс создания хобби профиля
 class ProfileHobbyCreateView(generics.GenericAPIView):
     # Класс сериализатора
@@ -89,6 +89,7 @@ class ProfileHobbyCreateView(generics.GenericAPIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 
+
 # Класс списка хобби профиля
 class ProfileHobbyListView(generics.ListAPIView):
     serializer_class = ProfileHobbySerializer
@@ -111,6 +112,7 @@ class ProfileHobbyListView(generics.ListAPIView):
             profile_hobbies_list.append(profile_hobby_dict)
 
         return profile_hobbies_list
+
 
 
 # Класс удаления хобби профиля
@@ -138,6 +140,42 @@ class ProfileHobbyDeleteView(generics.DestroyAPIView):
 
 
 
+# Функция удаления списка хобби профиля
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def profile_hobbies_delete(request):
+    # Получение объекта текущего профиля
+    profile = get_profile(request)
+    # Если полученные из запроса данные не являются списком
+    if not isinstance(request.data, list):
+        # Плохой ответ со статусом кода 400
+        return Response({"detail": "Необходимо передавать список id хобби профиля."},
+                        status=status.HTTP_400_BAD_REQUEST)
+    # Если полученный список является пустым
+    if not request.data:
+        # Плохой ответ со статусом кода 400
+        return Response({"detail": "Нельзя отправлять пустой список."},
+                        status=status.HTTP_400_BAD_REQUEST)
+    # Список хобби профиля, которые необходимо удалить.
+    # Вызываем получаем данные из запроса (request.data),
+    # а после пробегаемся по каждому элементу из полученнего,
+    # дабы собрать с каждого элемента значение по ключу id,
+    # и поместить все эти значения в список.
+    delete_hobbies_ids = [element.get("id") for element in request.data]
+    # Цикл из списка хобби профиля на удаление
+    for delete_hobby_id in delete_hobbies_ids:
+        try:
+            # Удаление хобби профиля из списка хобби профиля
+            ProfileHobby.objects.get(id=delete_hobby_id, profile=profile).delete()
+        except ProfileHobby.DoesNotExist:
+            # Плохой ответ со статусом кода 404
+            return Response({"detail": f"Хобби данного профиля с id {delete_hobby_id} не существует."}, status=status.HTTP_404_NOT_FOUND)
+
+    # Возвращение успешного ответа со статусом кода 200
+    return Response({"detail": "Список хобби профиля успешно удален!"}, status=status.HTTP_200_OK)
+
+
+
 # Список всех доступных хобби
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -153,50 +191,6 @@ def get_hobbies_list(request):
 
     return Response(hobbies_list_data, status=status.HTTP_200_OK)
 
-
-
-
-#функция создания списка изображений профиля
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def profile_images_create(request):
-    profile = get_profile(request)
-
-    if len(request.data) == 0:
-        return Response({"error": "Список изображений не должен быть пустым."}, status=status.HTTP_400_BAD_REQUEST)
-
-    profile_images_data = []
-    count = 0
-    while True:
-        count += 1
-        image = request.data.get(f"image_{count}", None)
-        is_main_image = request.data.get(f"is_main_image_{count}", None)
-        if image is not None and is_main_image is not None:
-            is_main_image = True if is_main_image == "true" else False
-            if is_main_image:
-                profile_images = ProfileImage.objects.filter(
-                    profile=profile,
-                    is_main_image=True
-                )
-                profile_images.update(is_main_image=False)
-
-            profile_image = ProfileImage.objects.create(profile=profile, image=image, is_main_image=is_main_image)
-            profile_image.save()
-            profile_images_data.append(ProfileImageSerializer(profile_image).data)
-        elif image is None and is_main_image is None:
-            break
-        else:
-            if image is None:
-                return Response({"error": f"У изображения профиля под номером {count} отсутсвует параметр image_{count}"}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({"error": f"У изображения профиля под номером {count} отсутсвует параметр is_main_image_{count}"}, status=status.HTTP_400_BAD_REQUEST)
-
-    if len(profile_images_data):
-        return Response(profile_images_data, status=status.HTTP_201_CREATED)
-    else:
-        return Response(
-            {"error": f"Вы ввели неверные данные или не ввели их вовсе."},
-            status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -289,21 +283,98 @@ class ProfileImageRetrieveView(generics.RetrieveAPIView):
 
 
 
-# Класс получения списка изображений профиля
-class ProfileImageListView(generics.ListAPIView):
-    # Класс сериализатора
-    serializer_class = ProfileImageSerializer
-    # Разрешенные классы
-    permission_classes = [IsAuthenticated]
+# Функция получения списка изображений профиля
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_profile_images(request):
+    # Объект профиля из запроса
+    profile = get_profile(request)
+    # Изображения профиля по профилю
+    profile_images = ProfileImage.objects.filter(profile=profile).all()
+    # Возвращение изображений пользователя и статуса кода 200
+    return Response(ProfileImageSerializer(profile_images, many=True).data, status=status.HTTP_200_OK)
 
-    # Метод получения списка объектов изображений профиля
-    def get_queryset(self):
-        # Объект профиля из запроса
-        profile = get_profile(self.request)
-        # Изображения профиля по профилю
-        profile_images = ProfileImage.objects.filter(profile=profile).all()
-        # Возвращение изображений пользователя
-        return profile_images
+
+
+# Функция создания списка изображений профиля
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def profile_images_create(request):
+    profile = get_profile(request)
+
+    if len(request.data) == 0:
+        return Response({"error": "Список изображений не должен быть пустым."}, status=status.HTTP_400_BAD_REQUEST)
+
+    profile_images_data = []
+    count = 0
+    while True:
+        count += 1
+        image = request.data.get(f"image_{count}", None)
+        is_main_image = request.data.get(f"is_main_image_{count}", None)
+        if image is not None and is_main_image is not None:
+            is_main_image = True if is_main_image == "true" else False
+            if is_main_image:
+                profile_images = ProfileImage.objects.filter(
+                    profile=profile,
+                    is_main_image=True
+                )
+                profile_images.update(is_main_image=False)
+
+            profile_image = ProfileImage.objects.create(profile=profile, image=image, is_main_image=is_main_image)
+            profile_image.save()
+            profile_images_data.append(ProfileImageSerializer(profile_image).data)
+        elif image is None and is_main_image is None:
+            break
+        else:
+            if image is None:
+                return Response({"error": f"У изображения профиля под номером {count} отсутсвует параметр image_{count}"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"error": f"У изображения профиля под номером {count} отсутсвует параметр is_main_image_{count}"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(profile_images_data):
+        return Response(profile_images_data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(
+            {"error": f"Вы ввели неверные данные или не ввели их вовсе."},
+            status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# Функция удаления списка изображений профиля
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def profile_images_delete(request):
+    # Получение объекта текущего профиля
+    profile = get_profile(request)
+
+    # Если полученные из запроса данные не являются списком
+    if not isinstance(request.data, list):
+        # Плохой ответ со статусом кода 400
+        return Response({"detail": "Необходимо передавать список id изображений профиля."},
+                        status=status.HTTP_400_BAD_REQUEST)
+    # Если полученный список является пустым
+    if not request.data:
+        # Плохой ответ со статусом кода 400
+        return Response({"detail": "Нельзя отправлять пустой список."},
+                        status=status.HTTP_400_BAD_REQUEST)
+    # Список хобби профиля, которые необходимо удалить.
+    # Вызываем получаем данные из запроса (request.data),
+    # а после пробегаемся по каждому элементу из полученнего,
+    # дабы собрать с каждого элемента значение по ключу id,
+    # и поместить все эти значения в список.
+    delete_images_ids = [element.get("id") for element in request.data]
+    # Список всех изображений профиля
+    for delete_image_id in delete_images_ids:
+        try:
+            # Удаление изображения данного профиля
+            ProfileImage.objects.get(id=delete_image_id, profile=profile).delete()
+        except ProfileImage.DoesNotExist:
+            # Плохой ответ со статусом кода 404
+            return Response({"detail": f"Хобби данного профиля с id {delete_image_id} не существует."},
+                            status=status.HTTP_404_NOT_FOUND)
+
+    # Возвращение успешного ответа со статусом кода 200
+    return Response({"detail": "Список изображений профиля успешно удален!"}, status=status.HTTP_200_OK)
 
 
 

@@ -8,14 +8,16 @@ urlpatterns = [
     path('hobbies/add/', views.ProfileHobbyListCreateView.as_view(), name='profile-hobbies-add'),
     path('hobby/add/', views.ProfileHobbyCreateView.as_view(), name='hobby-add'),
     path('hobby/<int:pk>/delete/', views.ProfileHobbyDeleteView.as_view(), name='hobby-delete'),
+    path('hobbies/delete/', views.profile_hobbies_delete, name='hobbies-delete'),
     path('hobbies/', views.ProfileHobbyListView.as_view(), name='hobbies'),
 
     # Пути до изображений профилей
     path('image/<int:pk>/delete/', views.ProfileImageDeleteView.as_view(), name='image-delete'),
+    path('images/delete/', views.profile_images_delete, name='images-delete'),
     path('image/<int:pk>/update/', views.ProfileImageUpdateView.as_view(), name='image-update'),
     path('image/<int:pk>/', views.ProfileImageRetrieveView.as_view(), name='image'),
     path('images/add/', views.profile_images_create, name='images-add'),
-    path('images/', views.ProfileImageListView.as_view(), name='images'),
+    path('images/', views.get_profile_images, name='images'),
 
     # Пути до профилей
     path('create/', views.ProfileCreateView.as_view() , name='create'),

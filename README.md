@@ -519,23 +519,11 @@
     }
     response = {
        "json": {
-           "id": "",
-           "first_name": "",
-           "last_name": "",
-           "gender": "",
-           "birthday": "",
-           "dating_purpose": "",
-           "searching_gender": "",
-           "description": "",
-           "smokes_cigarettes": "",
-           "drinks_alcoholics": "",
-           "has_children": "",
-           "zodiac_signs": "",
-           "education": "",
-           "job": "",
-           "age": "",
-           "is_active": true/false
-       }
+    "id": 5,
+    "image": "http://127.0.0.1:8000/media/profiles/images/%D0%BD%D0%B8%D0%B3%D0%B0_Sa6jrhf.jpg",
+    "uploaded_at": "2024-11-10T11:48:39.710649Z",
+    "is_main_image": true
+}
     } 
    9. Данные фото профиля (анкеты):
    url = http://127.0.0.1:8000/api/profile/image/<id_фото>/
@@ -555,9 +543,11 @@
     }
     response = {
        "json": {
-           "image": "",
-           "is_main_image": ""
-       }
+        "id": 5,
+        "image": "/media/profiles/images/%D0%BD%D0%B8%D0%B3%D0%B0_Sa6jrhf.jpg",
+        "uploaded_at": "2024-11-10T11:48:39.710649Z",
+        "is_main_image": false
+    }
     }
    10. Создаем фото профиля (анкеты):
    url = http://127.0.0.1:8000/api/profile/images/add/
@@ -584,9 +574,11 @@
     }
     response = {
        "json": {
-           "image": "",
-           "is_main_image": ""
-       }
+        "id": 5,
+        "image": "/media/profiles/images/%D0%BD%D0%B8%D0%B3%D0%B0_Sa6jrhf.jpg",
+        "uploaded_at": "2024-11-10T11:48:39.710649Z",
+        "is_main_image": false
+    }
     } 
    11. Список фото профиля (анкеты):
    url = http://127.0.0.1:8000/api/profile/images/
@@ -606,9 +598,13 @@
     response = {
        "json": {
            [
-               "image": "",
-               "is_main_image": ""
-           ]
+    {
+        "id": 5,
+        "image": "/media/profiles/images/%D0%BD%D0%B8%D0%B3%D0%B0_Sa6jrhf.jpg",
+        "uploaded_at": "2024-11-10T11:48:39.710649Z",
+        "is_main_image": false
+    }
+]
        }
     }
    12. Добавление хобби профиля (анкеты):
@@ -831,8 +827,52 @@
                }
           }
        ]
-    } 
-
+    }
+   20. Удаление списка хобби профиля:
+   url = http://127.0.0.1:8000/api/profile/hobbies/delete/
+   method = DELETE
+   media type = application/json
+   content = {
+   "headers": {
+        "Authorization": "Bearer <jwt>"
+   },
+   "cookies": {
+           "refresh_token": ""
+       }
+   },
+    "body": [
+       {
+            "id": "" #id хобби профиля
+       }
+   ],
+    }
+    response = {
+       "json": {
+           "detail": "Список хобби профиля успешно удален!"
+       }
+   21. Удаление списка изображений профиля:
+   url = http://127.0.0.1:8000/api/profile/images/delete/
+   method = DELETE
+   media type = application/json
+   content = {
+   "headers": {
+        "Authorization": "Bearer <jwt>"
+   },
+   "cookies": {
+           "refresh_token": ""
+       }
+   },
+    "body": [
+       {
+            "id": "" #id изображения профиля
+       }
+   ],
+    }
+    response = {
+       "json": {
+           "detail": "Список изображений профиля успешно удален!"
+       }
+    
 3. Приложение - chats:
    1. Все чаты пользователя:
    url = http://127.0.0.1:8000/api/chat/list/
