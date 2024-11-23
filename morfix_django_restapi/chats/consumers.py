@@ -266,7 +266,7 @@ class ChatListConsumer(AsyncWebsocketConsumer):
                         # т. е. вместо "_" используем "."
                         "type": "send.unseen.chats",
                         # Количество нерпочитанных чатов пользователя
-                        "unseen_chats_count": int(unseen_chats_count),
+                        "unseen_chats": int(unseen_chats_count),
                     },
                 )
             else:
