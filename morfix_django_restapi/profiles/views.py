@@ -141,7 +141,7 @@ class ProfileHobbyDeleteView(generics.DestroyAPIView):
 
 
 # Функция удаления списка хобби профиля
-@api_view(['DELETE'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def profile_hobbies_delete(request):
     # Получение объекта текущего профиля
@@ -341,7 +341,7 @@ def profile_images_create(request):
 
 
 # Функция удаления списка изображений профиля
-@api_view(['DELETE'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def profile_images_delete(request):
     # Получение объекта текущего профиля

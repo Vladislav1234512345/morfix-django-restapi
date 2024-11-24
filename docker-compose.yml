@@ -2,7 +2,8 @@ services:
   web:
     image: vladislav1234512345/morfix-django-restapi:${DJANGO_PROJECT_VERSION}
     command: >
-      sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 morfix_django_restapi.asgi:application"
+      sh -c "python manage.py collectstatic --noinput && python manage.py migrate && daphne -b 0.0.0.0 -p 8000 morfix_django_restapi.asgi:application"
+    restart: unless-stopped
     volumes:
       - /usr/src/app/static:/usr/src/app/static
       - /usr/src/app/media:/usr/src/app/media
@@ -30,6 +31,7 @@ services:
 #      POSTGRES_DB: ${DB_NAME}
 #      POSTGRES_USER: ${DB_USER}
 #      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    restart: unless-stopped
     env_file:
       - ./.env.db
     ports:
@@ -39,6 +41,7 @@ services:
 
   redis:
     image: redis:alpine
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
@@ -57,6 +60,7 @@ services:
 #      - DB_PORT=${DB_PORT}
 #      - REDIS_HOST=${REDIS_HOST}
 #      - REDIS_PORT=${REDIS_PORT}
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -76,6 +80,7 @@ services:
 #      - DB_PORT=${DB_PORT}
 #      - REDIS_HOST=${REDIS_HOST}
 #      - REDIS_PORT=${REDIS_PORT}
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:

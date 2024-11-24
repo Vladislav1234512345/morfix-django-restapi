@@ -30,7 +30,7 @@ load_dotenv()
 
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-_1*t3(z^!fpx9^u3w#s)um29ryz26r(cad)885)wmd71-zpt+l')
 
-DEBUG = bool(int(os.environ.get("DEBUG", 0)))
+DEBUG = bool(int(os.environ.get("DEBUG", 1)))
 
 # Разрешенные хосты
 # ALLOWED_HOSTS = ['*']
@@ -167,6 +167,7 @@ CSRF_TRUSTED_ORIGINS = str(
         "http://localhost:5173 http://localhost:8000 http://127.0.0.1:5173 http://127.0.0.1:8000"
     )
 ).split(" ")
+
 
 ROOT_URLCONF = 'morfix_django_restapi.urls'
 
